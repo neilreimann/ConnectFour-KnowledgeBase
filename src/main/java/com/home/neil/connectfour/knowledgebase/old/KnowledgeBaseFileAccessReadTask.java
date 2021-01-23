@@ -1,4 +1,4 @@
-package com.home.neil.connectfour.knowledgebase;
+package com.home.neil.connectfour.knowledgebase.old;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -13,7 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
 
-import com.home.neil.connectfour.knowledgebase.exception.KnowledgeBaseException;
+import com.home.neil.connectfour.knowledgebase.old.exception.KnowledgeBaseException;
 import com.home.neil.connectfour.managers.appmanager.ApplicationPrecompilerSettings;
 import com.home.neil.connectfour.performancemetrics.ThreadPerformanceMetricsMBean;
 

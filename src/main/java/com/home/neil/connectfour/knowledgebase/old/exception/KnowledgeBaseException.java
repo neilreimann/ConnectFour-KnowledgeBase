@@ -1,4 +1,4 @@
-package com.home.neil.connectfour.knowledgebase.exception;
+package com.home.neil.connectfour.knowledgebase.old.exception;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
