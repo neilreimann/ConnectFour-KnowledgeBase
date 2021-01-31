@@ -88,7 +88,7 @@ public class KnowledgeBaseFile {
 	
 	
 	public KnowledgeBaseFile(KnowledgeBaseFilePool pKnowledgeBaseFilePool, String pStateFileDirectory, String pStateFileLocation) throws ConfigurationException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 		
@@ -98,7 +98,7 @@ public class KnowledgeBaseFile {
 		mStateFileName = pStateFileLocation;
 		mKnowledgeBaseFilePool = pKnowledgeBaseFilePool;
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 	}
@@ -110,7 +110,7 @@ public class KnowledgeBaseFile {
 	
 
 	public void initialize() throws IOException,  DataFormatException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 
@@ -136,14 +136,14 @@ public class KnowledgeBaseFile {
 
 		mInitialized = true;
 		
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 	}
 	
 	
 	private void readKnowledgeBaseFile() throws IOException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 
@@ -166,13 +166,13 @@ public class KnowledgeBaseFile {
 			sLogger.debug("Read Successful: " + mCompressedFileLocation);
 			sLogger.error("Bytes Read: " + mKnowledgeBaseCacheMemoryCompression.length);
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 	}
 
 	private void retireKnowledgeBaseFile() throws IOException, DataFormatException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 
@@ -209,7 +209,7 @@ public class KnowledgeBaseFile {
 			sLogger.debug("Compression Successful: " + mCompressedFileLocation);
 			sLogger.debug("Bytes Written: " + mKnowledgeBaseCacheMemoryCompression.length);
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 	}
@@ -266,7 +266,7 @@ public class KnowledgeBaseFile {
 
 	
 	public void compressMemory () throws IOException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 
@@ -312,14 +312,14 @@ public class KnowledgeBaseFile {
 		if (sLogger.isDebugEnabled()) {
 			sLogger.debug("Memory Compression Successful");
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 				
 	}
 	
 	private void uncompressMemory () throws IOException,DataFormatException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 
@@ -362,7 +362,7 @@ public class KnowledgeBaseFile {
 		if (sLogger.isDebugEnabled()) {
 			sLogger.debug("Memory Decompression Successful");
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 		
@@ -371,37 +371,37 @@ public class KnowledgeBaseFile {
 	
 
 	public void setBeingCleaned() {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 		mBeingCleaned = true;
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 	}
 
 	public boolean getBeingCleaned() {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 		return mBeingCleaned;
 	}
 
 	public boolean isCleaned() {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 		return mCleaned;
 	}
 
 	public void cleanup() throws IOException, DataFormatException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 
@@ -424,23 +424,23 @@ public class KnowledgeBaseFile {
 		}
 		mCleaned = true;
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 	}
 
 	public String getFileLocation() {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 		return mStateFileName;
 	}
 
 	public void writeScore(int pFileIndex, byte pScoreToWrite) throws IOException, DataFormatException, KnowledgeBaseException, ConfigurationException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 
@@ -471,13 +471,13 @@ public class KnowledgeBaseFile {
 
 			sLogger.debug("KnowledgeBaseFile Write Score: " + pScoreToWrite + " at: " + pFileIndex);
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 	}
 
 	public byte readScore(int pFileIndex) throws IOException, KnowledgeBaseException, ConfigurationException, DataFormatException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 
@@ -504,7 +504,7 @@ public class KnowledgeBaseFile {
 			sLogger.debug("KnowledgeBaseFile Read Score: " + lScoreRead + " at: " + pFileIndex);
 		}
 		
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 

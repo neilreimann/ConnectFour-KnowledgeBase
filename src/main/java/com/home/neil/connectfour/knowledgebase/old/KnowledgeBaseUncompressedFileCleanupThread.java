@@ -43,7 +43,7 @@ public class KnowledgeBaseUncompressedFileCleanupThread extends Thread implement
 	protected KnowledgeBaseFilePool mKnowledgeBaseFilePool = null;
 	
 	public synchronized void renameThread(String pLogContext) {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.debug("Entering");
 		}
 		sThreadNumber++;
@@ -58,7 +58,7 @@ public class KnowledgeBaseUncompressedFileCleanupThread extends Thread implement
 			ThreadContext.put("LogContext", mLogContext);
 		}
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 	}
@@ -230,7 +230,7 @@ public class KnowledgeBaseUncompressedFileCleanupThread extends Thread implement
 	}
 
 	public void runCompressionThread() throws IOException, ConfigurationException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 
@@ -271,7 +271,7 @@ public class KnowledgeBaseUncompressedFileCleanupThread extends Thread implement
 			sLogger.debug("Compression is complete");
 		}
 		
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 		

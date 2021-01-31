@@ -13,7 +13,7 @@ public abstract class IndexEntry implements IIndexEntry {
 	private long mIndex = 0;
 	private static HashMap<String, Long> sIndex = new HashMap<String, Long>();
 	
-	protected long setIndexEntry(Class pClass) {
+	protected long setIndexEntry(Class<?> pClass) {
 		mIndex = getNextIndex (pClass);
 		return mIndex;
 	}
@@ -22,7 +22,7 @@ public abstract class IndexEntry implements IIndexEntry {
 		return mIndex;
 	}
 
-	private static synchronized long getNextIndex (Class pClass) {
+	private static synchronized long getNextIndex (Class<?> pClass) {
 		long lIndex = (sIndex.get(pClass.toString()).longValue());
 		lIndex++;
 		sIndex.put(pClass.toString(), Long.valueOf(lIndex));

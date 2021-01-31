@@ -32,7 +32,7 @@ public class KnowledgeBaseFileAccessReadEvaluatedTask extends KnowledgeBaseFileA
 	}
 
 	protected void renameTask(String pLogContext) {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 		incTaskNumber();
@@ -47,37 +47,37 @@ public class KnowledgeBaseFileAccessReadEvaluatedTask extends KnowledgeBaseFileA
 			ThreadContext.put("LogContext", mLogContext);
 		}
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 	}
 
 	public KnowledgeBaseFileAccessReadEvaluatedTask(KnowledgeBaseFilePool pKnowledgeBaseFilePool, String pStateString, String pActionString, byte pEvaluationThreadInfo, String pLogContext) throws ConfigurationException, KnowledgeBaseException  {
 		super(pKnowledgeBaseFilePool, pStateString, pActionString, pLogContext);
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 
 		mEvaluationThreadInfo = pEvaluationThreadInfo;
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 	}
 
 	public KnowledgeBaseFileAccessReadEvaluatedTask(KnowledgeBaseFilePool pKnowledgeBaseFilePool, String pStateString, String pActionString, String pLogContext) throws ConfigurationException, KnowledgeBaseException  {
 		super(pKnowledgeBaseFilePool, pStateString, pActionString, pLogContext);
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 	}
 
 	public void executeTask() {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 
@@ -168,13 +168,13 @@ public class KnowledgeBaseFileAccessReadEvaluatedTask extends KnowledgeBaseFileA
 				sLogger.error("StackTrace: " + lSW);
 			}
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 	}
 
 	public void readScore() throws IOException, KnowledgeBaseException, ConfigurationException, DataFormatException  {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 		mCurrentThread = Thread.currentThread();
@@ -201,7 +201,7 @@ public class KnowledgeBaseFileAccessReadEvaluatedTask extends KnowledgeBaseFileA
 		if (mKnowledgeBaseFileInUse == null) {
 			sLogger.error("Read file: " + mFileLocation + " at Location: " + Integer.toHexString(mFileIndex) + " COULD NOT GET THE FILES RESERVED!");
 			mTransactionSuccessful = false;
-			if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 				sLogger.trace("Exiting");
 			}
 			return;
@@ -213,28 +213,28 @@ public class KnowledgeBaseFileAccessReadEvaluatedTask extends KnowledgeBaseFileA
 
 		mTransactionSuccessful = true;
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 		return;
 	}
 
 	public void interrupt() {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 		mCurrentThread.interrupt();
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 	}
 
 	@Override
 	public String getWaitingThreadName() {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 		return mCurrentThread.getName();

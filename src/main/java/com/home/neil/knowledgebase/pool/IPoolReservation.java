@@ -1,8 +1,8 @@
 package com.home.neil.knowledgebase.pool;
 
-import com.home.neil.knowledgebase.task.ITask;
+import com.home.neil.knowledgebase.pool.task.IPoolItemTask;
 
 public interface IPoolReservation {
 	public IPoolItem getPoolItem();
-	public ITask getTask();
+	public IPoolItemTask getTask();
 }

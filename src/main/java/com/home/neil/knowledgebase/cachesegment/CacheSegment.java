@@ -7,15 +7,14 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.home.neil.connectfour.managers.appmanager.ApplicationPrecompilerSettings;
-import com.home.neil.knowledgebase.KnowledgeBaseConstants;
+import com.home.neil.appmanager.ApplicationPrecompilerSettings;
+import com.home.neil.knowledgebase.IKnowledgeBaseObject;
 
-public class CacheSegment implements ICacheSegment {
+public class CacheSegment implements ICacheSegment, IKnowledgeBaseObject {
 	public static final String CLASS_NAME = CacheSegment.class.getName();
 	public static final String PACKAGE_NAME = CLASS_NAME.substring(0, CLASS_NAME.lastIndexOf("."));
 	public static final Logger sLogger = LogManager.getLogger(PACKAGE_NAME);
-	public static final String TRACE_ENTERING = "Entering";
-	public static final String TRACE_EXITING = "Exiting";
+
 
 	public enum CACHESTATE {
 		INSTANTIATED, READY, RETIRED
@@ -35,8 +34,8 @@ public class CacheSegment implements ICacheSegment {
 	}
 
 	public void init() throws CacheSegmentStateException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_ENTERING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
 		if (mThreadSafe) {
@@ -47,86 +46,80 @@ public class CacheSegment implements ICacheSegment {
 			initCritical();
 		}
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
 	}
 
 
 	private void initCritical() throws CacheSegmentStateException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_ENTERING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
 		if (mCacheSegmentState != CACHESTATE.INSTANTIATED) {
 			sLogger.error("Cache Segment is not in a instantiated state!  GO AWAY! State: {} ", mCacheSegmentState);
-			if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-				sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
 			throw new CacheSegmentStateException();
 		}
 		mCacheSegmentState = CACHESTATE.READY;
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
 	}
 
-	public byte[] retire() throws CacheSegmentStateException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_ENTERING);
+	public void retire() throws CacheSegmentStateException {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
-		byte[] lCacheSegment = null;
 		if (mThreadSafe) {
 			synchronized (mCacheSegmentStateLock) {
-				lCacheSegment = retireCritical();
+				retireCritical();
 			}
 		} else {
-			lCacheSegment = retireCritical();
+			retireCritical();
 		}
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
-		return lCacheSegment;
 	}
 
-	private byte[] retireCritical() throws CacheSegmentStateException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_ENTERING);
+	private void retireCritical() throws CacheSegmentStateException {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
-		byte[] lCacheSegment = null;
 		if (mCacheSegmentState != CACHESTATE.READY) {
 			sLogger.error("Cache Segment is not in a ready state!  GO AWAY! State: {} ", mCacheSegmentState);
-			if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-				sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
 			throw new CacheSegmentStateException();
 		}
 		mCacheSegmentState = CACHESTATE.RETIRED;
-		lCacheSegment = mCacheSegment;
-		mCacheSegment = null;
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
-		return lCacheSegment;
 	}
 
 	public byte[] readScore(int pFileIndex, int pSize)
 			throws IOException, CacheSegmentStateException, ConfigurationException, DataFormatException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_ENTERING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
 		byte[] lScoreRead = new byte[pSize];
 
 		if (mCacheSegmentState != CACHESTATE.READY) {
 			sLogger.error("Cache Segment is not in a ready state!  GO AWAY! State: {} ", mCacheSegmentState);
-			if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-				sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
 			throw new CacheSegmentStateException();
 		}
@@ -137,8 +130,8 @@ public class CacheSegment implements ICacheSegment {
 			}
 		}
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
 
 		return lScoreRead;
@@ -147,14 +140,14 @@ public class CacheSegment implements ICacheSegment {
 
 	public void writeScore(int pFileIndex, byte[] pScoreToWrite, int pSize)
 			throws IOException, DataFormatException, CacheSegmentStateException, ConfigurationException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_ENTERING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
 		if (mCacheSegmentState != CACHESTATE.READY) {
 			sLogger.error("Cache Segment is not in a ready state!  GO AWAY! State: {}.", mCacheSegmentState);
-			if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-				sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
 			throw new CacheSegmentStateException();
 		}
@@ -169,8 +162,8 @@ public class CacheSegment implements ICacheSegment {
 			}
 		}
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
 	}
 
@@ -178,4 +171,8 @@ public class CacheSegment implements ICacheSegment {
 		return mCacheSegmentDirty;
 	}
 
+	public byte [] getCacheSegment() {
+		return mCacheSegment;
+	}
+	
 }

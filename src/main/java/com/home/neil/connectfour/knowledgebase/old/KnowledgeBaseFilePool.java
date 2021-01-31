@@ -145,7 +145,7 @@ public class KnowledgeBaseFilePool implements KnowledgeBaseFilePoolMBean {
 	}
 
 	public LinkedList <KnowledgeBaseFile> getKnowledgeBaseUncompressedFilesToCleanup () throws IOException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 
@@ -180,7 +180,7 @@ public class KnowledgeBaseFilePool implements KnowledgeBaseFilePoolMBean {
 		if (sLogger.isDebugEnabled()) {
 			sLogger.debug("Memory Compressions Check Done");
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 		
@@ -209,7 +209,7 @@ public class KnowledgeBaseFilePool implements KnowledgeBaseFilePoolMBean {
 	
 	
 	private KnowledgeBaseFilePool() throws ConfigurationException, IOException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 		mCurrentLastAccessedUnReservedKnowledgeBaseFiles = new TreeSet<KnowledgeBaseFile>(new KnowledgeBaseFileCompressedIndexComparator());
@@ -239,13 +239,13 @@ public class KnowledgeBaseFilePool implements KnowledgeBaseFilePoolMBean {
 		}
 		
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 	}
 
 	public KnowledgeBaseFilePool (String pSessionId) throws ConfigurationException, IOException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 		mCurrentLastAccessedUnReservedKnowledgeBaseFiles = new TreeSet<KnowledgeBaseFile>(new KnowledgeBaseFileCompressedIndexComparator());
@@ -275,7 +275,7 @@ public class KnowledgeBaseFilePool implements KnowledgeBaseFilePoolMBean {
 			mKnowledgeBaseUncompressedFileCleanupThread [i] .start();
 		}
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 	}
@@ -284,7 +284,7 @@ public class KnowledgeBaseFilePool implements KnowledgeBaseFilePoolMBean {
 	
 	//Gets the master instance
 	public static synchronized KnowledgeBaseFilePool getMasterInstance() throws IOException, ConfigurationException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 		if (sMasterInstance == null) {
@@ -311,14 +311,14 @@ public class KnowledgeBaseFilePool implements KnowledgeBaseFilePoolMBean {
 			}
 
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 		return sMasterInstance;
 	}
 
 	public synchronized void cleanupAll() throws IOException,DataFormatException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 		
@@ -363,14 +363,14 @@ public class KnowledgeBaseFilePool implements KnowledgeBaseFilePoolMBean {
 		}
 		
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 	}
 
 	public synchronized boolean reserveKnowledgeBaseFile(String pFileDirectory, String pFileLocation, KnowledgeBaseFileAccessTaskInterface pTask)
 			throws IOException, ConfigurationException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 		
@@ -392,7 +392,7 @@ public class KnowledgeBaseFilePool implements KnowledgeBaseFilePoolMBean {
 			}
 			 */
 			
-			if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 				sLogger.trace("Exiting");
 			}
 			return true;
@@ -438,7 +438,7 @@ public class KnowledgeBaseFilePool implements KnowledgeBaseFilePoolMBean {
 
 			pTask.setKnowledgeBaseFileInUse(lKnowledgeBaseFile);
 
-			if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 				sLogger.trace("Exiting");
 			}
 			/*
@@ -479,7 +479,7 @@ public class KnowledgeBaseFilePool implements KnowledgeBaseFilePoolMBean {
 			}
 			*/
 			
-			if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 				sLogger.trace("Exiting");
 			}
 			return true;
@@ -501,7 +501,7 @@ public class KnowledgeBaseFilePool implements KnowledgeBaseFilePoolMBean {
 				}
 				*/
 				
-				if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+				if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 					sLogger.trace("Exiting");
 				}
 				return false;
@@ -518,7 +518,7 @@ public class KnowledgeBaseFilePool implements KnowledgeBaseFilePoolMBean {
 				}
 				*/
 				
-				if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+				if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 					sLogger.trace("Exiting");
 				}
 				return false;
@@ -527,7 +527,7 @@ public class KnowledgeBaseFilePool implements KnowledgeBaseFilePoolMBean {
 	}
 
 	public synchronized void releaseKnowledgeBaseFile(KnowledgeBaseFile pKnowledgeBaseFile) {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 		String lFileLocation = pKnowledgeBaseFile.getFileLocation();
@@ -537,7 +537,7 @@ public class KnowledgeBaseFilePool implements KnowledgeBaseFilePoolMBean {
 			if (sLogger.isDebugEnabled()) {
 				sLogger.debug("State6: Lock Released on Finalized File: " + lFileLocation + " for Thread: " + Thread.currentThread().getName());
 			}
-			if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 				sLogger.trace("Exiting");
 			}
 			return;
@@ -552,7 +552,7 @@ public class KnowledgeBaseFilePool implements KnowledgeBaseFilePoolMBean {
 			if (sLogger.isDebugEnabled()) {
 				sLogger.debug("State7: Lock Released and No Thread Waiting: " + lFileLocation + " for Thread: " + Thread.currentThread().getName());
 			}
-			if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 				sLogger.trace("Exiting");
 			}
 			return;
@@ -563,7 +563,7 @@ public class KnowledgeBaseFilePool implements KnowledgeBaseFilePoolMBean {
 			if (sLogger.isDebugEnabled()) {
 				sLogger.debug("State8: Lock Released and No Thread Waiting: " + lFileLocation + " for Thread: " + Thread.currentThread().getName());
 			}
-			if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 				sLogger.trace("Exiting");
 			}
 			return;
@@ -577,46 +577,46 @@ public class KnowledgeBaseFilePool implements KnowledgeBaseFilePoolMBean {
 			}
 		}
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 	}
 
 	public String getCurrentUnReservedKnowledgeBaseFilesSize() {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 		return String.valueOf(mCurrentUnReservedKnowledgeBaseFiles.size());
 	}
 
 	public String getCurrentLastAccessedUnReservedKnowledgeBaseFilesSize() {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 		return String.valueOf(mCurrentLastAccessedUnReservedKnowledgeBaseFiles.size());
 	}
 
 	public String getCurrentReservedKnowledgeBaseFilesSize() {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 		return String.valueOf(mCurrentReservedKnowledgeBaseFiles.size());
 	}
 
 	public String getCurrentReservationsSize() {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 		return String.valueOf(mCurrentReservations.size());

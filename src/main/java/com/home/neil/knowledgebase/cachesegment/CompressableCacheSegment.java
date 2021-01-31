@@ -10,10 +10,10 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.home.neil.connectfour.managers.appmanager.ApplicationPrecompilerSettings;
-import com.home.neil.knowledgebase.KnowledgeBaseConstants;
+import com.home.neil.appmanager.ApplicationPrecompilerSettings;
+import com.home.neil.knowledgebase.IKnowledgeBaseObject;
 
-public class CompressableCacheSegment implements ICompressableCacheSegment {
+public class CompressableCacheSegment implements ICompressableCacheSegment, IKnowledgeBaseObject {
 	public static final String CLASS_NAME = CompressableCacheSegment.class.getName();
 	public static final String PACKAGE_NAME = CLASS_NAME.substring(0, CLASS_NAME.lastIndexOf("."));
 	public static final Logger sLogger = LogManager.getLogger(PACKAGE_NAME);
@@ -46,8 +46,8 @@ public class CompressableCacheSegment implements ICompressableCacheSegment {
 
 	@Override
 	public void init() throws CacheSegmentStateException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_ENTERING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
 		synchronized (mMemoryCompressionLock) {
@@ -60,22 +60,22 @@ public class CompressableCacheSegment implements ICompressableCacheSegment {
 			}
 		}
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
 	}
 	
 	
 	private void initCritical () throws CacheSegmentStateException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_ENTERING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
 		if (mCompressableCacheSegmentState != COMPRESSABLE_CACHESTATE.INSTANTIATED) {
 			sLogger.error("Cache Segment is not in a instantiated state!  GO AWAY! State: {} ",
 					mCompressableCacheSegmentState);
-			if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-				sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
 			throw new CacheSegmentStateException();
 		}
@@ -94,63 +94,60 @@ public class CompressableCacheSegment implements ICompressableCacheSegment {
 					mCompressableCacheSegmentState);
 
 			mCompressableCacheSegmentState = COMPRESSABLE_CACHESTATE.ERROR;
-			if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-				sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
 			throw new CacheSegmentStateException(e);
 		} catch (DataFormatException e) {
 			mCompressableCacheSegmentState = COMPRESSABLE_CACHESTATE.ERROR;
-			if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-				sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
 			throw new CacheSegmentStateException(e);
 		} catch (CacheSegmentStateException e) {
-			if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-				sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
 			throw new CacheSegmentStateException();
 		}
 		
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
 	}
 
 	@Override
-	public byte[] retire() throws CacheSegmentStateException, IOException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_ENTERING);
+	public void retire() throws CacheSegmentStateException {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
-		byte[] lCompressedCacheSegment = null;
 
 		synchronized (mMemoryCompressionLock) {
 			if (mThreadSafe) {
 				synchronized (mMemoryCompressionLock) {
-					lCompressedCacheSegment = retireCritical();
+					retireCritical();
 				}
 			} else {
-				lCompressedCacheSegment = retireCritical();
+				retireCritical();
 			}
 		}
 		
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
-		return lCompressedCacheSegment;
 	}
 	
-	private byte[] retireCritical () throws CacheSegmentStateException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_ENTERING);
+	private void retireCritical () throws CacheSegmentStateException {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
-		byte[] lCompressedCacheSegment = null;
 
 		if (mMemoryCompressionLock != COMPRESSABLE_CACHESTATE.COMPRESSED
 				&& mMemoryCompressionLock != COMPRESSABLE_CACHESTATE.UNCOMPRESSED) {
 			sLogger.error("Cache Segment is not in a compressed or uncompressed state!  GO AWAY! State: {} ",
 					mCompressableCacheSegmentState);
-			if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-				sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
 			throw new CacheSegmentStateException();
 		}
@@ -160,40 +157,37 @@ public class CompressableCacheSegment implements ICompressableCacheSegment {
 				compress();
 			} catch (IOException e) {
 				mCompressableCacheSegmentState = COMPRESSABLE_CACHESTATE.ERROR;
-				if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-					sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+				if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+					sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 				}
 				throw new CacheSegmentStateException(e);
 			}
 		}
 
 		mCompressableCacheSegmentState = COMPRESSABLE_CACHESTATE.RETIRED;
-		lCompressedCacheSegment = mCompressableCacheSegment;
-		mCompressableCacheSegment = null;
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
-		return lCompressedCacheSegment;
 	}
 	
 	
 
-	public byte[] getRetiredDebugCacheSegment() throws CacheSegmentStateException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_ENTERING);
+	public byte[] getRetiredUnCompressedCacheSegment() throws CacheSegmentStateException {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 		if (mMemoryCompressionLock != COMPRESSABLE_CACHESTATE.RETIRED) {
 			sLogger.error("Cache Segment is not in a retired state!  GO AWAY! State: {} ",
 					mCompressableCacheSegmentState);
-			if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-				sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
 			throw new CacheSegmentStateException();
 		}
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
 		return mDebugCacheSegment;
 	}
@@ -201,8 +195,8 @@ public class CompressableCacheSegment implements ICompressableCacheSegment {
 	@Override
 	public byte[] readScore(int pFileIndex, int pSize)
 			throws IOException, CacheSegmentStateException, ConfigurationException, DataFormatException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_ENTERING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
 		byte[] lReadScore = null;
@@ -210,16 +204,16 @@ public class CompressableCacheSegment implements ICompressableCacheSegment {
 		if (mCompressableCacheSegmentState != COMPRESSABLE_CACHESTATE.UNCOMPRESSED) {
 			sLogger.error("Cache Segment is not in a uncompressed state!  GO AWAY! State: {} ",
 					mCompressableCacheSegmentState);
-			if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-				sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
 			throw new CacheSegmentStateException();
 		}
 
 		lReadScore = mCacheSegment.readScore(pFileIndex, pSize);
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
 		return lReadScore;
 	}
@@ -227,29 +221,29 @@ public class CompressableCacheSegment implements ICompressableCacheSegment {
 	@Override
 	public void writeScore(int pFileIndex, byte[] pScoreToWrite, int pSize)
 			throws IOException, DataFormatException, CacheSegmentStateException, ConfigurationException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_ENTERING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
 		if (mCompressableCacheSegmentState != COMPRESSABLE_CACHESTATE.UNCOMPRESSED) {
 			sLogger.error("Cache Segment is not in a uncompressed state!  GO AWAY! State: {} ",
 					mCompressableCacheSegmentState);
-			if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-				sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
 			throw new CacheSegmentStateException();
 		}
 
 		mCacheSegment.writeScore(pFileIndex, pScoreToWrite, pSize);
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
 	}
 
 	public void uncompress() throws IOException, DataFormatException, CacheSegmentStateException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_ENTERING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
 		if (sLogger.isDebugEnabled()) {
@@ -269,15 +263,15 @@ public class CompressableCacheSegment implements ICompressableCacheSegment {
 		if (sLogger.isDebugEnabled()) {
 			sLogger.debug("Memory Decompression Successful");
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
 
 	}
 
 	private void initializeFirstTimeSegment() throws IOException, DataFormatException, CacheSegmentStateException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_ENTERING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
 		if (sLogger.isDebugEnabled()) {
@@ -297,15 +291,15 @@ public class CompressableCacheSegment implements ICompressableCacheSegment {
 		if (sLogger.isDebugEnabled()) {
 			sLogger.debug("Uncompressed Memory Initialization Successful");
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
 
 	}
 
-	private void initializeFirstTimeSegmentCritical() throws IOException, DataFormatException, CacheSegmentStateException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_ENTERING);
+	private void initializeFirstTimeSegmentCritical() throws CacheSegmentStateException {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
 		byte [] lUncompressedCacheSegment = new byte [mCacheSegmentSize];
@@ -320,23 +314,23 @@ public class CompressableCacheSegment implements ICompressableCacheSegment {
 
 		mCompressableCacheSegmentState = COMPRESSABLE_CACHESTATE.UNCOMPRESSED;
 		
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
 
 	}
 	
 	
 	private void uncompressCritical () throws IOException, DataFormatException, CacheSegmentStateException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_ENTERING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
 		if (mCompressableCacheSegmentState != COMPRESSABLE_CACHESTATE.COMPRESSED) {
 			sLogger.error("Cache Segment is not in a compressed state!  GO AWAY! State: %s ",
 					mCompressableCacheSegmentState);
-			if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-				sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
 			throw new CacheSegmentStateException();
 		}
@@ -368,16 +362,16 @@ public class CompressableCacheSegment implements ICompressableCacheSegment {
 
 		mCompressableCacheSegmentState = COMPRESSABLE_CACHESTATE.UNCOMPRESSED;
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
 	}
 	
 	
 	
 	public void compress() throws IOException, CacheSegmentStateException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_ENTERING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
 		if (sLogger.isDebugEnabled()) {
@@ -397,15 +391,15 @@ public class CompressableCacheSegment implements ICompressableCacheSegment {
 		if (sLogger.isDebugEnabled()) {
 			sLogger.debug("Memory Compression Successful");
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
 
 	}
 
 	private void compressCritical() throws IOException, CacheSegmentStateException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_ENTERING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
 		if (sLogger.isDebugEnabled()) {
@@ -415,15 +409,16 @@ public class CompressableCacheSegment implements ICompressableCacheSegment {
 		if (mCompressableCacheSegmentState != COMPRESSABLE_CACHESTATE.UNCOMPRESSED) {
 			sLogger.error("Cache Segment is not in a uncompressed state!  GO AWAY! State: %s ",
 					mCompressableCacheSegmentState);
-			if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-				sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
 			throw new CacheSegmentStateException();
 		}
 
-		byte[] lCacheSegment = mCacheSegment.retire();
+		mCacheSegment.retire();
+		
 		if (sLogger.isDebugEnabled()) {
-			mDebugCacheSegment = lCacheSegment;
+			mDebugCacheSegment = mCacheSegment.getCacheSegment();
 		}
 
 		if (mCacheSegment.isCacheSegmentDirty()) {
@@ -434,7 +429,7 @@ public class CompressableCacheSegment implements ICompressableCacheSegment {
 
 			mCacheSegment = null;
 
-			lDeflater.setInput(lCacheSegment);
+			lDeflater.setInput(mDebugCacheSegment);
 
 			ByteArrayOutputStream lBAOS = new ByteArrayOutputStream(mCacheSegmentSize);
 
@@ -473,8 +468,8 @@ public class CompressableCacheSegment implements ICompressableCacheSegment {
 		if (sLogger.isDebugEnabled()) {
 			sLogger.debug("Memory Compression Successful");
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
 
 	}
@@ -485,4 +480,8 @@ public class CompressableCacheSegment implements ICompressableCacheSegment {
 		return mCompressableCacheSegmentDirty;
 	}
 
+	public byte [] getCompressedCacheSegment () {
+		return mCompressableCacheSegment;
+	}
+	
 }

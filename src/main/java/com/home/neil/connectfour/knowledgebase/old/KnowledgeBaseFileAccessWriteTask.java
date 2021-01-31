@@ -32,7 +32,7 @@ public class KnowledgeBaseFileAccessWriteTask extends KnowledgeBaseFileAccessTas
 	}
 
 	protected void renameTask(String pLogContext) {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.debug("Entering");
 		}
 		incTaskNumber();
@@ -47,14 +47,14 @@ public class KnowledgeBaseFileAccessWriteTask extends KnowledgeBaseFileAccessTas
 			ThreadContext.put("LogContext", mLogContext);
 		}
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.debug("Exiting");
 		}
 	}
 
 	public KnowledgeBaseFileAccessWriteTask(KnowledgeBaseFilePool pKnowledgeBaseFilePool, String pStateString, String pActionString, byte pBoardScore, String pLogContext) throws ConfigurationException, KnowledgeBaseException {
 		super(pKnowledgeBaseFilePool, pStateString, pActionString, pLogContext);
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.debug("Entering");
 		}
 
@@ -64,13 +64,13 @@ public class KnowledgeBaseFileAccessWriteTask extends KnowledgeBaseFileAccessTas
 			mBoardScore = pBoardScore;
 		}
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.debug("Exiting");
 		}
 	}
 
 	public void executeTask() {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.debug("Entering");
 		}
 		if (sLogMetrics) {
@@ -161,13 +161,13 @@ public class KnowledgeBaseFileAccessWriteTask extends KnowledgeBaseFileAccessTas
 				sLogger.error("StackTrace: " + lSW);
 			}
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.debug("Exiting");
 		}
 	}
 
 	public void updateScore() throws IOException, DataFormatException, KnowledgeBaseException, ConfigurationException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.debug("Entering");
 		}
 		
@@ -196,7 +196,7 @@ public class KnowledgeBaseFileAccessWriteTask extends KnowledgeBaseFileAccessTas
 		if (mKnowledgeBaseFileInUse == null) {
 			sLogger.error("Update file: " + mFileLocation + " at Location: " + Long.toHexString(mFileIndex) + " COULD NOT GET THE FILES RESERVED!");
 			mTransactionSuccessful = false;
-			if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 				sLogger.debug("Exiting");
 			}
 			return;
@@ -210,27 +210,27 @@ public class KnowledgeBaseFileAccessWriteTask extends KnowledgeBaseFileAccessTas
 
 		mTransactionSuccessful = true;
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.debug("Exiting");
 		}
 		return;
 	}
 
 	public boolean isTransactionSuccessful() {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.debug("Entering");
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.debug("Exiting");
 		}
 		return mTransactionSuccessful;
 	}
 
 	public boolean isScoreFound() {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.debug("Entering");
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.debug("Exiting");
 		}
 		return mScoreFound;

@@ -7,10 +7,6 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 
 public interface ICacheSegment {
 	
-	public void init () throws CacheSegmentStateException, IOException;
-	
-	public byte [] retire () throws CacheSegmentStateException, IOException;
-	
 	public byte [] readScore(int pFileIndex, int pSize) throws IOException, CacheSegmentStateException, ConfigurationException, DataFormatException;
 	
 	public void writeScore(int pFileIndex, byte [] pScoreToWrite, int pSize) throws IOException, DataFormatException, CacheSegmentStateException, ConfigurationException;

@@ -35,10 +35,10 @@ public abstract class KnowledgeBaseFileAccessEvaluatedTask implements KnowledgeB
 	protected Thread mCurrentThread = null;
 	
 	public String getTaskName () {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 		return mTaskName;
@@ -47,7 +47,7 @@ public abstract class KnowledgeBaseFileAccessEvaluatedTask implements KnowledgeB
 	protected abstract void renameTask (String pLogContext);
 	
 	public KnowledgeBaseFileAccessEvaluatedTask(KnowledgeBaseFilePool pKnowledgeBaseFilePool, String pStateString, String pActionString, String pLogContext) throws ConfigurationException, KnowledgeBaseException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 
@@ -65,20 +65,20 @@ public abstract class KnowledgeBaseFileAccessEvaluatedTask implements KnowledgeB
 			determineFilesAndIndexes(pStateString, pActionString);
 		} catch (ConfigurationException eCE) {
 			sLogger.error("Configuration Exception Occurred!");
-			if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 				sLogger.trace("Exiting");
 			}
 			throw eCE;
 		}
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 	}
 
 
 	public KnowledgeBaseFileAccessEvaluatedTask(KnowledgeBaseFilePool pKnowledgeBaseFilePool, KnowledgeBaseFile pKnowledgeBaseFile, String pLogContext) {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 
@@ -88,43 +88,43 @@ public abstract class KnowledgeBaseFileAccessEvaluatedTask implements KnowledgeB
 
 		mKnowledgeBaseFileInUse = pKnowledgeBaseFile;
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 	}
 
 	public boolean isTransactionFinished() {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 		return mTransactionFinished;
 	}
 
 	public KnowledgeBaseFile getKnowledgeBaseFileInUse() {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 		return mKnowledgeBaseFileInUse;
 	}
 
 	public void setKnowledgeBaseFileInUse(KnowledgeBaseFile pKnowledgeBaseFileInUse) {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 		mKnowledgeBaseFileInUse = pKnowledgeBaseFileInUse;
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 	}
 
 	private void determineFilesAndIndexes(String pStateString, String pActionString) throws ConfigurationException, KnowledgeBaseException {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 		
@@ -176,7 +176,7 @@ public abstract class KnowledgeBaseFileAccessEvaluatedTask implements KnowledgeB
 			sLogger.debug("MoveString: " + pActionString + " File Directory: " + mFileDirectory + " File Location: " + mFileLocation + " FileIndex = " + mFileIndex);
 		}
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 
@@ -185,20 +185,20 @@ public abstract class KnowledgeBaseFileAccessEvaluatedTask implements KnowledgeB
 	public abstract void executeTask ();
 
 	public boolean isTransactionSuccessful() {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 		return mTransactionSuccessful;
 	}
 
 	public byte getEvaluationThreadInfo() {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Exiting");
 		}
 		return mEvaluationThreadInfo;

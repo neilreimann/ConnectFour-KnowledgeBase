@@ -5,7 +5,7 @@ import java.io.File;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.home.neil.connectfour.managers.appmanager.ApplicationPrecompilerSettings;
+import com.home.neil.appmanager.ApplicationPrecompilerSettings;
 import com.home.neil.knowledgebase.KnowledgeBaseConstants;
 
 public class CacheSegmentFile implements ICacheSegmentFile {
@@ -31,8 +31,8 @@ public class CacheSegmentFile implements ICacheSegmentFile {
 	protected int mCacheSegmentSize = 0;
 	
 	public CacheSegmentFile(String pBasePath, String[] pStatePaths, String pFileName, int pCacheSegmentSize) {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_ENTERING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
 		mBasePath = pBasePath;
@@ -52,8 +52,8 @@ public class CacheSegmentFile implements ICacheSegmentFile {
 		mFullPathDebugFile = new File (mFullPathDebugFileName);
 
 		mCacheSegmentSize = pCacheSegmentSize;
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
 	}
 

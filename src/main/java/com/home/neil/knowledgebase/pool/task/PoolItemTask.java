@@ -10,11 +10,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
 
-import com.home.neil.connectfour.managers.appmanager.ApplicationPrecompilerSettings;
-import com.home.neil.connectfour.performancemetrics.ThreadPerformanceMetricsMBean;
-import com.home.neil.knowledgebase.KnowledgeBaseConstants;
+import com.home.neil.appmanager.ApplicationPrecompilerSettings;
 import com.home.neil.knowledgebase.pool.IPool;
 import com.home.neil.knowledgebase.pool.IPoolItem;
+import com.home.neil.knowledgebase.pool.PoolException;
+import com.home.neil.thread.performancemetrics.ThreadPerformanceMetricsMBean;
 
 public abstract class PoolItemTask implements IPoolItemTask {
 	public static final String CLASS_NAME = PoolItemTask.class.getName();
@@ -52,8 +52,8 @@ public abstract class PoolItemTask implements IPoolItemTask {
 	}
 	
 	public void renameTask(String pLogContext) {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_ENTERING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 		
 		incTaskNumber();
@@ -70,8 +70,8 @@ public abstract class PoolItemTask implements IPoolItemTask {
 			ThreadContext.put("LogContext", mLogContext);
 		}
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
 	}
 
@@ -83,20 +83,26 @@ public abstract class PoolItemTask implements IPoolItemTask {
 		return mExecutingThread.getName();
 	}
 	
-	public void notifyThread() {
-		notifyAll();
-	}
-
-	
 	public void startTask  () {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_ENTERING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 		mExecutingThread = Thread.currentThread();
 		
 		logStartingTaskMetrics();
 
-		mPoolItem = mPool.reservePoolItem(mPoolItemId, this);
+		
+		try {
+			mPoolItem = mPool.reservePoolItem(mPoolItemId, this);
+		} catch (PoolException e1) {
+			sLogger.error("Could not reserve the PoolItem!");
+			mTaskSuccessful = false;
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+			}
+			return;
+		}
+		
 		if (mPoolItem == null) {
 			try {
 				wait(10000);
@@ -109,9 +115,10 @@ public abstract class PoolItemTask implements IPoolItemTask {
 		if (mPoolItem == null) {
 			sLogger.error("Could not reserve the PoolItem!");
 			mTaskSuccessful = false;
-			if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-				sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
+			
 			return;
 		}
 		
@@ -131,23 +138,31 @@ public abstract class PoolItemTask implements IPoolItemTask {
 			mTaskSuccessful = false;
 		}
 		
-		
-		mPool.releasePoolItem(mPoolItem);
+		try {
+			mPool.releasePoolItem(mPoolItem);
+		} catch (PoolException e1) {
+			sLogger.error("Could not reserve the PoolItem!");
+			mTaskSuccessful = false;
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+			}
+			return;
+		}
 		
 		logEndingTaskMetrics();
 		
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
 	}
 	
 	
-	protected abstract boolean executeTask() throws Exception;
+	protected abstract boolean executeTask() throws PoolException;
 	
 	
 	private void logStartingTaskMetrics () {
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_ENTERING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 		
 		if (sLogMetrics) {
@@ -155,15 +170,15 @@ public abstract class PoolItemTask implements IPoolItemTask {
 			sLogger.debug("Thread: {} is starting at {}", getTaskName(), mTaskStartTime);
 		}
 		
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
 	}
 
 	private void logEndingTaskMetrics () {
 		
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_ENTERING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
 		mTaskFinished = true;
@@ -197,8 +212,8 @@ public abstract class PoolItemTask implements IPoolItemTask {
 			}
 		}
 
-		if (ApplicationPrecompilerSettings.TRACELOGACTIVE) {
-			sLogger.trace(KnowledgeBaseConstants.TRACE_EXITING);
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
 	}
 	
