@@ -13,9 +13,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
 
+import com.home.neil.appmanager.ApplicationPrecompilerSettings;
 import com.home.neil.connectfour.knowledgebase.old.exception.KnowledgeBaseException;
-import com.home.neil.connectfour.managers.appmanager.ApplicationPrecompilerSettings;
-import com.home.neil.connectfour.performancemetrics.ThreadPerformanceMetricsMBean;
+import com.home.neil.thread.performancemetrics.ThreadPerformanceMetricsMBean;
 
 public class KnowledgeBaseFileAccessWriteEvaluatedTask extends KnowledgeBaseFileAccessEvaluatedTask {
 	public static final String SIMPLE_CLASS_NAME = KnowledgeBaseFileAccessWriteEvaluatedTask.class.getSimpleName();

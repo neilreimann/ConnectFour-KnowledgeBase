@@ -1,4 +1,4 @@
-package com.home.neil.knowledgebase.file;
+package com.home.neil.knowledgebase.cachesegment.file;
 
 import java.io.File;
 
@@ -6,10 +6,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.home.neil.appmanager.ApplicationPrecompilerSettings;
-import com.home.neil.knowledgebase.KnowledgeBaseConstants;
+import com.home.neil.knowledgebase.IKnowledgeBaseObject;
+import com.home.neil.knowledgebase.cachesegment.IReadWriteCacheSegment;
+import com.home.neil.knowledgebase.cachesegment.IStorageCacheSegment;
 
-public class CacheSegmentFile implements ICacheSegmentFile {
-	public static final String CLASS_NAME = CacheSegmentFile.class.getName();
+public class FileCacheSegment implements IFileCacheSegment, IStorageCacheSegment, IKnowledgeBaseObject {
+	public static final String CLASS_NAME = FileCacheSegment.class.getName();
 	public static final String PACKAGE_NAME = CLASS_NAME.substring(0, CLASS_NAME.lastIndexOf("."));
 	public static final Logger sLogger = LogManager.getLogger(PACKAGE_NAME);
 	
@@ -30,7 +32,7 @@ public class CacheSegmentFile implements ICacheSegmentFile {
 	
 	protected int mCacheSegmentSize = 0;
 	
-	public CacheSegmentFile(String pBasePath, String[] pStatePaths, String pFileName, int pCacheSegmentSize) {
+	public FileCacheSegment(String pBasePath, String pFileName, int pCacheSegmentSize) {
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}

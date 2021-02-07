@@ -1,4 +1,4 @@
-package com.home.neil.knowledgebase.cachesegment.file;
+package com.home.neil.knowledgebase.cachesegment;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -14,18 +14,15 @@ import org.apache.logging.log4j.Logger;
 
 import com.home.neil.appmanager.ApplicationPrecompilerSettings;
 import com.home.neil.knowledgebase.IKnowledgeBaseObject;
-import com.home.neil.knowledgebase.cachesegment.CacheSegmentStateException;
-import com.home.neil.knowledgebase.cachesegment.CompressableCacheSegment;
-import com.home.neil.knowledgebase.cachesegment.ICompressableCacheSegment;
-import com.home.neil.knowledgebase.file.CacheSegmentFile;
+import com.home.neil.knowledgebase.cachesegment.file.FileCacheSegment;
 
-public class CompressableCacheSegmentFile extends CacheSegmentFile implements ICompressableCacheSegment, IKnowledgeBaseObject {
+public class CompressableCacheSegmentFile extends FileCacheSegment implements ICompressableCacheSegment, IKnowledgeBaseObject {
 	public static final String CLASS_NAME = CompressableCacheSegment.class.getName();
 	public static final String PACKAGE_NAME = CLASS_NAME.substring(0, CLASS_NAME.lastIndexOf("."));
 	public static final Logger sLogger = LogManager.getLogger(PACKAGE_NAME);
 
 	public enum COMPRESSABLECACHESEGMENTFILESTATE {
-		INSTANTIATED, READY, RETIRED, ERROR
+		INSTANTIATED, MEMORYUNCOMPRESSED, DISKUNCOMPRESSED, MEMORYCOMPRESSED, DISKCOMPRESSED, ERROR
 	}
 
 	private COMPRESSABLECACHESEGMENTFILESTATE mCompressableCacheSegmentFileState = COMPRESSABLECACHESEGMENTFILESTATE.INSTANTIATED;

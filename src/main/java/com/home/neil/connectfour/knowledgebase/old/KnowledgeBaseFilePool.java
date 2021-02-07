@@ -22,8 +22,8 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.home.neil.connectfour.appconfig.Connect4PropertiesConfiguration;
-import com.home.neil.connectfour.managers.appmanager.ApplicationPrecompilerSettings;
+import com.home.neil.appconfig.Connect4PropertiesConfiguration;
+import com.home.neil.appmanager.ApplicationPrecompilerSettings;
 
 public class KnowledgeBaseFilePool implements KnowledgeBaseFilePoolMBean {
 	public static final String CLASS_NAME = KnowledgeBaseFilePool.class.getName();

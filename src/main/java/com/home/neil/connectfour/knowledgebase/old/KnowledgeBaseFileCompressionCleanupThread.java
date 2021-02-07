@@ -11,8 +11,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
 
-import com.home.neil.connectfour.managers.appmanager.ApplicationPrecompilerSettings;
-import com.home.neil.connectfour.performancemetrics.ThreadPerformanceMetricsMBean;
+import com.home.neil.appmanager.ApplicationPrecompilerSettings;
+import com.home.neil.thread.performancemetrics.ThreadPerformanceMetricsMBean;
 
 public class KnowledgeBaseFileCompressionCleanupThread extends Thread implements KnowledgeBaseFileAccessTaskInterface {
 	public static final String CLASS_NAME = KnowledgeBaseFileCompressionCleanupThread.class.getName();

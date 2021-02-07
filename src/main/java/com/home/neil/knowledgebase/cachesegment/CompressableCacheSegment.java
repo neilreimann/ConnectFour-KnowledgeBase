@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.home.neil.appmanager.ApplicationPrecompilerSettings;
 import com.home.neil.knowledgebase.IKnowledgeBaseObject;
+import com.home.neil.knowledgebase.cachesegment.memory.MemoryCacheSegment;
 
 public class CompressableCacheSegment implements ICompressableCacheSegment, IKnowledgeBaseObject {
 	public static final String CLASS_NAME = CompressableCacheSegment.class.getName();
@@ -25,7 +26,7 @@ public class CompressableCacheSegment implements ICompressableCacheSegment, IKno
 	private COMPRESSABLE_CACHESTATE mCompressableCacheSegmentState = COMPRESSABLE_CACHESTATE.INSTANTIATED;
 
 	private byte[] mCompressableCacheSegment = null;
-	private CacheSegment mCacheSegment = null;
+	private MemoryCacheSegment mCacheSegment = null;
 	private final Object mMemoryCompressionLock = new Object();
 	private int mCacheSegmentSize = 0;
 	private boolean mCompressableCacheSegmentDirty = false;
@@ -304,7 +305,7 @@ public class CompressableCacheSegment implements ICompressableCacheSegment, IKno
 
 		byte [] lUncompressedCacheSegment = new byte [mCacheSegmentSize];
 		
-		mCacheSegment = new CacheSegment(false, lUncompressedCacheSegment);
+		mCacheSegment = new MemoryCacheSegment(false, lUncompressedCacheSegment);
 
 		mCacheSegment.init();
 
@@ -351,7 +352,7 @@ public class CompressableCacheSegment implements ICompressableCacheSegment, IKno
 
 		lBAOS.close();
 
-		mCacheSegment = new CacheSegment(false, lBAOS.toByteArray());
+		mCacheSegment = new MemoryCacheSegment(false, lBAOS.toByteArray());
 
 		mCacheSegment.init();
 

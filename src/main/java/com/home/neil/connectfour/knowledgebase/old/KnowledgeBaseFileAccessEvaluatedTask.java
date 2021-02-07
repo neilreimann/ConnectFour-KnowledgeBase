@@ -4,8 +4,8 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.home.neil.appmanager.ApplicationPrecompilerSettings;
 import com.home.neil.connectfour.knowledgebase.old.exception.KnowledgeBaseException;
-import com.home.neil.connectfour.managers.appmanager.ApplicationPrecompilerSettings;
 
 public abstract class KnowledgeBaseFileAccessEvaluatedTask implements KnowledgeBaseFileAccessTaskInterface {
 	public static final String CLASS_NAME = KnowledgeBaseFileAccessEvaluatedTask.class.getName();

@@ -12,7 +12,9 @@ import com.home.neil.knowledgebase.IKnowledgeBaseObject;
 import com.home.neil.knowledgebase.index.ILastAccessIndex;
 import com.home.neil.knowledgebase.index.LastAccessIndex;
 import com.home.neil.knowledgebase.pool.task.IPoolItemTask;
-import com.home.neil.knowledgebase.pool.thread.PoolItemRetiringThread;
+import com.home.neil.knowledgebase.pool.thread.initialization.IPoolItemInitializationThread;
+import com.home.neil.knowledgebase.pool.thread.operations.IPoolItemOperationsThread;
+import com.home.neil.knowledgebase.pool.thread.retiring.IPoolItemRetiringThread;
 
 public abstract class Pool implements IPool, IKnowledgeBaseObject {
 	public static final String CLASS_NAME = Pool.class.getName();
@@ -25,47 +27,47 @@ public abstract class Pool implements IPool, IKnowledgeBaseObject {
 	
 	private POOLSTATE mPoolState = POOLSTATE.INSTANTIATED;
 
-	private HashMap<String, IPoolItem> mCurrentActiveUnReservedPoolItems = null;
-	private HashMap<String, IPoolItem> mCurrentActiveReservedPoolItems = null;
-	private HashMap<String, IPoolItem> mCurrentRetiringPoolItems = null;
-	private HashMap<String, IPoolItem> mCurrentTerminalPoolItems = null;
+	//Active Pool
+	private HashMap<String, IPoolItem> mActivePool_ReservedPoolItems = null;
+	private HashMap<String, IPoolItem> mActivePool_UnReservedPoolItems = null;
+	private IPoolReservations mActivePool_Reservations = null;
+	private ILastAccessIndex [] mActivePool_PoolItemLastAccessIndexes = null;
+	private int mActivePool_HighWaterMark = 1000;
+	private int mActivePool_LowWaterMark = 900;
+	private int mActivePool_Count = 0;
+	private LinkedList <IPoolItemInitializationThread> mActivePool_PoolItemInitializationThreads = null; 
+	private LinkedList <IPoolItemOperationsThread> mActivePool_PoolItemOperationsThreads = null; 
+	private LinkedList <IPoolItemRetiringThread> mActivePool_PoolItemRetirementThreads = null; 
 	
+	private int mSubPool_Levels = 0; 
+	//Sub Pool 
+	private HashMap<String, IPoolItem> [] mSubPool_PoolItems = null;
+	private IPoolReservations [] mSubPool_Reservations = null;
+	private ILastAccessIndex [] mSubPool_PoolItemLastAccessIndexes = null;
+	private LinkedList <IPoolItemInitializationThread> [] mSubPool_PoolItemInitializationThreads = null; 
+	private LinkedList <IPoolItemRetiringThread> [] mSubPool_PoolItemRetirementThreads = null; 
+	private int [] mSubPool_HighWaterMarks = null;
+	private int [] mSubPool_LowWaterMarks = null;
+	private int [] mSubPool_Counts = null;
 	
-	private IPoolReservations mActiveReservations = null;
-	private IPoolReservations mRetiringReservations = null;
-	private IPoolReservations mTerminalReservations = null;
+	//The Drain
+	private HashMap <String, IPoolItem> mDrainPoolItems = null;
+	private IPoolReservations mDrainResurrectionReservations = null;
 	
-	private ILastAccessIndex mActiveLastAccessIndex = null;
-	private ILastAccessIndex mRetiringLastAccessIndex = null;
-
-	private int mActiveHighWaterMark = 10;
-	private int mActiveLowWaterMark = 8;
-	private int mRetiringHighWaterMark = 500;
-	private int mRetiringLowWaterMark = 400;
-	
-	private int mActivePoolItems = 0;
-	private int mRetiringPoolItems = 0;
-	
-	private final Object mPoolLock = new Object();
-	
-	protected PoolItemRetiringThread [] mPoolItemRetiringThreads; 
-	
-	protected Pool(int pActiveHighWaterMark, int pActiveLowWaterMark, int pRetiringHighWaterMark, int pRetiringLowWaterMark) {
+	protected Pool(int pPoolLevels, int [] pHighWaterMarks, int [] pLowWaterMarks) {
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
-		mActiveHighWaterMark = pActiveHighWaterMark;
-		mActiveLowWaterMark = pActiveLowWaterMark;
-		mActivePoolItems = 0;
+		mPoolLevels = pPoolLevels;
 		
-		mRetiringHighWaterMark = pRetiringHighWaterMark;
-		mRetiringLowWaterMark = pRetiringLowWaterMark;
-		mRetiringPoolItems = 0;
-
-		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
-			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+		mHighWaterMarks = pHighWaterMarks;
+		mLowWaterMarks = pLowWaterMarks;
+		
+		mPoolItemCounts = new int [mPoolLevels];
+		for (int i  = 0; i < mPoolLevels; i++) {
+			mPoolItemCounts [i] = 0;
 		}
-
+		
 		sLogger.debug("Pool is entering INSTANTIATED State");
 		mPoolState = POOLSTATE.INSTANTIATED;
 
@@ -86,6 +88,8 @@ public abstract class Pool implements IPool, IKnowledgeBaseObject {
 			}
 			throw new PoolException();
 		}
+
+		
 		
 		mCurrentActiveUnReservedPoolItems = new HashMap<>();
 		mCurrentActiveReservedPoolItems = new HashMap<>();

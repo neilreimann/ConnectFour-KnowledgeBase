@@ -1,6 +1,6 @@
-package com.home.neil.knowledgebase.file;
+package com.home.neil.knowledgebase.cachesegment.file;
 
-public interface ICacheSegmentFile {
+public interface IFileCacheSegment {
 	
 	public String getBasePath();
 	

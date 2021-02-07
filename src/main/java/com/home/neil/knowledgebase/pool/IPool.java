@@ -10,11 +10,7 @@ public interface IPool {
 
 	public void releasePoolItem (IPoolItem pPoolItem) throws PoolException;
 	
-	public void retirePoolItem (String pPoolItemId) throws PoolException;
+	public void retirePoolItem (int pLevel, String pPoolItemId) throws PoolException;
 
-	public void terminatePoolItem (String pPoolItemId) throws PoolException;
-
-	public List<IPoolItem> getRetiringPoolItems() throws PoolException;
-
-	public List<IPoolItem> getTerminatingPoolItems() throws PoolException;
+	public List<IPoolItem> getRetiringPoolItems(int pLevel) throws PoolException;
 }
