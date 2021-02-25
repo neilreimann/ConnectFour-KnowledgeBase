@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import com.home.neil.appmanager.ApplicationPrecompilerSettings;
 import com.home.neil.knowledgebase.pool.IPool;
 import com.home.neil.knowledgebase.pool.IPoolItem;
+import com.home.neil.knowledgebase.pool.thread.operations.IPoolItemOperationsTask;
 import com.home.neil.task.BasicAppTask;
 
 public abstract class PoolItemInitializationTask extends BasicAppTask implements IPoolItemInitializationTask {
@@ -15,10 +16,10 @@ public abstract class PoolItemInitializationTask extends BasicAppTask implements
 	
 	protected IPool mPool = null;
 	protected String mPoolItemId = null;
+	protected IPoolItemOperationsTask mPoolItemOperationsTask = null;
 	protected IPoolItem mPoolItem = null;
 	
-	
-	protected PoolItemInitializationTask(IPool pPool, String pLogContext, boolean pRecordThreadStatistics) {
+	protected PoolItemInitializationTask(IPool pPool, String pPoolItemId, IPoolItemOperationsTask pPoolItemOperationsTask, String pLogContext, boolean pRecordThreadStatistics) {
 		super(pLogContext, pRecordThreadStatistics);
 		
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
@@ -26,6 +27,8 @@ public abstract class PoolItemInitializationTask extends BasicAppTask implements
 		}
 		
 		mPool = pPool;
+		mPoolItemId = pPoolItemId;
+		mPoolItemOperationsTask = pPoolItemOperationsTask;
 		
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
@@ -36,12 +39,16 @@ public abstract class PoolItemInitializationTask extends BasicAppTask implements
 		return mPool;
 	}
 
-	public IPoolItem getPoolItem() {
-		return mPoolItem;
-	}
-
 	public String getPoolItemId() {
 		return mPoolItemId;
+	}
+	
+	public IPoolItemOperationsTask getPoolItemOperationsTask () {
+		return mPoolItemOperationsTask;
+	}
+	
+	public IPoolItem getPoolItem() {
+		return null;
 	}
 
 

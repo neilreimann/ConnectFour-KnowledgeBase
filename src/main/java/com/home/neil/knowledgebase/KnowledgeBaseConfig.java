@@ -36,7 +36,6 @@ public class KnowledgeBaseConfig {
 		mPathCountPerAction = lConfig.getInt(CONFIGKEY_PATHCOUNTPERCACTION, 7);
 		mMetaDataSizeInBytesPerAction = lConfig.getInt(CONFIGKEY_METADATASIZEINBYTESPERACTION, 1);
 		mScoreSizeInBytes = lConfig.getInt(CONFIGKEY_SCORESIZEINBYTES, 1);
-
 	}
 
 	public static synchronized KnowledgeBaseConfig getInstance () throws NoSuchElementException, ConfigurationException, IOException {

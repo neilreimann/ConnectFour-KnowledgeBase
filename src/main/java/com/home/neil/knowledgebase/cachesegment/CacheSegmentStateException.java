@@ -20,8 +20,14 @@ public class CacheSegmentStateException extends KnowledgeBaseException {
 		super ("CacheSegmentStateException occurred.  Underlying "+ pE.getClass().getName(), pE);
 	}
 	
+	public CacheSegmentStateException (String pMessage) {
+		super (pMessage);
+	}
+
 	public CacheSegmentStateException (String pMessage, Exception pE) {
 		super (pMessage, pE);
 	}
+	
+	
 
 }

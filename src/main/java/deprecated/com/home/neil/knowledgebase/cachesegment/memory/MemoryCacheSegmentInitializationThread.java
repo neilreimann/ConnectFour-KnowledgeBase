@@ -1,4 +1,4 @@
-package com.home.neil.knowledgebase.cachesegment.memory;
+package deprecated.com.home.neil.knowledgebase.cachesegment.memory;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

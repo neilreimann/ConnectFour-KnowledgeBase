@@ -1,4 +1,4 @@
-package com.home.neil.knowledgebase.cachesegment;
+package deprecated.com.home.neil.knowledgebase.cachesegment;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -14,7 +14,8 @@ import org.apache.logging.log4j.Logger;
 
 import com.home.neil.appmanager.ApplicationPrecompilerSettings;
 import com.home.neil.knowledgebase.IKnowledgeBaseObject;
-import com.home.neil.knowledgebase.cachesegment.file.FileCacheSegment;
+import com.home.neil.knowledgebase.cachesegment.CacheSegmentStateException;
+import com.home.neil.knowledgebase.cachesegment.ICompressableCacheSegment;
 
 public class CompressableCacheSegmentFile extends FileCacheSegment implements ICompressableCacheSegment, IKnowledgeBaseObject {
 	public static final String CLASS_NAME = CompressableCacheSegment.class.getName();

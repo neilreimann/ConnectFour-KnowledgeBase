@@ -1,8 +1,5 @@
 package com.home.neil.knowledgebase.pool.thread.operations;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -24,7 +21,7 @@ public abstract class PoolItemOperationsTask extends BasicAppTask implements IPo
 	
 	protected PoolItemOperationsTask(IPool pPool, String pPoolItemId, String pLogContext, boolean pRecordTaskStatistics) {
 		super(pLogContext, pRecordTaskStatistics);
-		
+		mPoolItemId = pPoolItemId;
 		mPool=pPool;
 	}
 
@@ -104,9 +101,13 @@ public abstract class PoolItemOperationsTask extends BasicAppTask implements IPo
 	
 	
 
-	@Override
 	public IPoolItem getPoolItem() {
 		return mReservedPoolItem;
 	}	
+	
+	
+	public String getPoolItemId() {
+		return mPoolItemId;
+	}
 
 }

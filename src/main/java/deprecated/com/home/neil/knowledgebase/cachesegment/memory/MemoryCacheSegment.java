@@ -1,4 +1,4 @@
-package com.home.neil.knowledgebase.cachesegment.memory;
+package deprecated.com.home.neil.knowledgebase.cachesegment.memory;
 
 import java.io.IOException;
 import java.util.zip.DataFormatException;

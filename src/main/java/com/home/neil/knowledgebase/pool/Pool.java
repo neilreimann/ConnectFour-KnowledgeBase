@@ -1,5 +1,6 @@
 package com.home.neil.knowledgebase.pool;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,8 +14,10 @@ import com.home.neil.knowledgebase.index.ILastAccessIndex;
 import com.home.neil.knowledgebase.index.LastAccessIndex;
 import com.home.neil.knowledgebase.pool.task.IPoolItemTask;
 import com.home.neil.knowledgebase.pool.thread.initialization.IPoolItemInitializationThread;
+import com.home.neil.knowledgebase.pool.thread.operations.IPoolItemOperationsTask;
 import com.home.neil.knowledgebase.pool.thread.operations.IPoolItemOperationsThread;
 import com.home.neil.knowledgebase.pool.thread.retiring.IPoolItemRetiringThread;
+import com.home.neil.knowledgebase.pool.thread.retiring.IPoolItemRetiringThreadFactory;
 
 public abstract class Pool implements IPool, IKnowledgeBaseObject {
 	public static final String CLASS_NAME = Pool.class.getName();
@@ -27,46 +30,141 @@ public abstract class Pool implements IPool, IKnowledgeBaseObject {
 	
 	private POOLSTATE mPoolState = POOLSTATE.INSTANTIATED;
 
-	//Active Pool
-	private HashMap<String, IPoolItem> mActivePool_ReservedPoolItems = null;
-	private HashMap<String, IPoolItem> mActivePool_UnReservedPoolItems = null;
-	private IPoolReservations mActivePool_Reservations = null;
-	private ILastAccessIndex [] mActivePool_PoolItemLastAccessIndexes = null;
-	private int mActivePool_HighWaterMark = 1000;
-	private int mActivePool_LowWaterMark = 900;
-	private int mActivePool_Count = 0;
-	private LinkedList <IPoolItemInitializationThread> mActivePool_PoolItemInitializationThreads = null; 
-	private LinkedList <IPoolItemOperationsThread> mActivePool_PoolItemOperationsThreads = null; 
-	private LinkedList <IPoolItemRetiringThread> mActivePool_PoolItemRetirementThreads = null; 
+	//Active Pool Variables
+	private class ActivePoolVars {
+		private HashMap<String, IPoolItem> mReservedPoolItems = null;
+		private HashMap<String, IPoolItem> mUnReservedPoolItems = null;
+		private HashMap<String, IPoolItem> mRetiringPoolItems = null;
+		private IPoolReservations mReservations = null;
+		private IPoolReservations mResurrectionReservations = null;
+		private ILastAccessIndex mPoolItemLastAccessIndexes = null;
+		private int mHighWaterMark = 100;
+		private int mLowWaterMark = 90;
+		private int mCount = 0;
+		
+		private Class <?> mPoolItemInitializationThreadClassFactory = null;
+		private LinkedList <IPoolItemInitializationThread> mPoolItemInitializationThreads = null; 
+		
+		private LinkedList <IPoolItemOperationsThread> mPoolItemOperationsThreads = null; 
+
+		private Class <?> mPoolItemRetirementThreadClassFactory = null;
+		private LinkedList <IPoolItemRetiringThread> mPoolItemRetirementThreads = null; 
+		private int mPoolItemRetirementThreadCount = 2;
+	}
+
+
+	private class SubPoolVars {
+		private HashMap<String, IPoolItem> mPoolItems = null;
+		private HashMap<String, IPoolItem> mRetiringPoolItems = null;
+		private IPoolReservations mResurrectionReservations = null;
+		private ILastAccessIndex mPoolItemLastAccessIndexes = null;
+		
+		private int mHighWaterMarks = 100;
+		private int mLowWaterMarks = 90;
+		private int mCount = 0;
+
+		private Class <?> mPoolItemResurrectionThreadClassFactory = null;
+		private LinkedList <IPoolItemInitializationThread> mPoolItemResurrectionThreads = null; 
+
+		private Class <?> mPoolItemRetirementThreadClassFactory = null;
+		private LinkedList <IPoolItemRetiringThread> mPoolItemRetirementThreads = null; 
+		private int mPoolItemRetirementThreadCount = 2;
+	}
 	
-	private int mSubPool_Levels = 0; 
-	//Sub Pool 
-	private HashMap<String, IPoolItem> [] mSubPool_PoolItems = null;
-	private IPoolReservations [] mSubPool_Reservations = null;
-	private ILastAccessIndex [] mSubPool_PoolItemLastAccessIndexes = null;
-	private LinkedList <IPoolItemInitializationThread> [] mSubPool_PoolItemInitializationThreads = null; 
-	private LinkedList <IPoolItemRetiringThread> [] mSubPool_PoolItemRetirementThreads = null; 
-	private int [] mSubPool_HighWaterMarks = null;
-	private int [] mSubPool_LowWaterMarks = null;
-	private int [] mSubPool_Counts = null;
 	
-	//The Drain
-	private HashMap <String, IPoolItem> mDrainPoolItems = null;
-	private IPoolReservations mDrainResurrectionReservations = null;
+	//Drain Variables
+//	private class DrainVars {
+//		private Class <?> mPoolItemResurrectionThreadClassFactory = null;
+//		private LinkedList <IPoolItemInitializationThread> mPoolItemResurrectionThreads = null; 
+//		
+//		private Class <?> mPoolItemRetirementThreadClassFactory = null;
+//		private LinkedList <IPoolItemRetiringThread> mPoolItemRetirementThreads = null; 
+//		private int mPoolItemRetirementThreadCount = 2;
+//	}
 	
-	protected Pool(int pPoolLevels, int [] pHighWaterMarks, int [] pLowWaterMarks) {
+	private ActivePoolVars mActivePoolVars = null;
+	private int mSubPoolLevels = 0; 
+	private SubPoolVars [] mSubPoolVars = null;
+	//private DrainVars mDrainVars = null;
+	
+	private final Object mPoolLock = new Object();
+	
+	protected Pool(PoolConfig pPoolConfig) throws PoolException {
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
-		mPoolLevels = pPoolLevels;
+		mSubPoolLevels = pPoolConfig.getSubPoolLevels();
 		
-		mHighWaterMarks = pHighWaterMarks;
-		mLowWaterMarks = pLowWaterMarks;
-		
-		mPoolItemCounts = new int [mPoolLevels];
-		for (int i  = 0; i < mPoolLevels; i++) {
-			mPoolItemCounts [i] = 0;
+		mActivePoolVars = new ActivePoolVars ();
+		mActivePoolVars.mHighWaterMark = pPoolConfig.getActiveHighWaterMark();
+		mActivePoolVars.mLowWaterMark = pPoolConfig.getActiveLowWaterMark();
+
+		try {
+			mActivePoolVars.mPoolItemInitializationThreadClassFactory = Class.forName(pPoolConfig.getActiveInitializationThreadClassFactory());
+		} catch (ClassNotFoundException e) {
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+			}
+			throw new PoolException (e);
 		}
+		
+		try {
+			mActivePoolVars.mPoolItemRetirementThreadClassFactory = Class.forName(pPoolConfig.getActiveRetirementThreadClassFactory());
+		} catch (ClassNotFoundException e) {
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+			}
+			throw new PoolException (e);
+		}
+		mActivePoolVars.mPoolItemRetirementThreadCount = pPoolConfig.getActiveRetirementThreadCount();
+		
+		
+		if (mSubPoolLevels > 0) {
+			mSubPoolVars = new SubPoolVars[mSubPoolLevels];
+			for (int i = 0; i < mSubPoolLevels; i++) {
+				mSubPoolVars[i].mHighWaterMarks = pPoolConfig.getSubPoolHighWaterMark(i);
+				mSubPoolVars[i].mLowWaterMarks = pPoolConfig.getSubPoolHighWaterMark(i);
+
+				try {
+					mSubPoolVars[i].mPoolItemResurrectionThreadClassFactory = Class.forName(pPoolConfig.getSubPoolResurrectionThreadClassFactory(i));
+				} catch (ClassNotFoundException e) {
+					if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+						sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+					}
+					throw new PoolException (e);
+				}
+				
+				try {
+					mSubPoolVars[i].mPoolItemRetirementThreadClassFactory = Class.forName(pPoolConfig.getSubPoolRetirementThreadClassFactory(i));
+				} catch (ClassNotFoundException e) {
+					if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+						sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+					}
+					throw new PoolException (e);
+				}
+				mSubPoolVars[i].mPoolItemRetirementThreadCount = pPoolConfig.getSubPoolRetirementThreadCount(i);
+				
+			}
+		}
+
+//		try {
+//			mDrainVars.mPoolItemResurrectionThreadClassFactory = Class.forName(pPoolConfig.getDrainResurrectionThreadClassFactory());
+//		} catch (ClassNotFoundException e) {
+//			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+//				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+//			}
+//			throw new PoolException (e);
+//		}
+//
+//		try {
+//			mDrainVars.mPoolItemRetirementThreadClassFactory = Class.forName(pPoolConfig.getDrainRetirementThreadClassFactory());
+//		} catch (ClassNotFoundException e) {
+//			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+//				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+//			}
+//			throw new PoolException (e);
+//		}
+//		mDrainVars.mPoolItemRetirementThreadCount = pPoolConfig.getDrainRetirementThreadCount();
 		
 		sLogger.debug("Pool is entering INSTANTIATED State");
 		mPoolState = POOLSTATE.INSTANTIATED;
@@ -89,36 +187,101 @@ public abstract class Pool implements IPool, IKnowledgeBaseObject {
 			throw new PoolException();
 		}
 
+		mActivePoolVars.mUnReservedPoolItems = new HashMap<> ();
+		mActivePoolVars.mReservedPoolItems = new HashMap<> ();
+		mActivePoolVars.mRetiringPoolItems = new HashMap<> ();
+		mActivePoolVars.mPoolItemLastAccessIndexes = new LastAccessIndex();
+		mActivePoolVars.mReservations = new PoolReservations();
+		mActivePoolVars.mCount = 0;
+
+		
+		mActivePoolVars.mPoolItemInitializationThreads = new LinkedList <> ();
+		mActivePoolVars.mPoolItemOperationsThreads = new LinkedList <> ();
+		mActivePoolVars.mPoolItemRetirementThreads = new LinkedList <> ();
 		
 		
-		mCurrentActiveUnReservedPoolItems = new HashMap<>();
-		mCurrentActiveReservedPoolItems = new HashMap<>();
-		mActiveLastAccessIndex = new LastAccessIndex();
-		mActiveReservations = new PoolReservations();
-		mActivePoolItems = 0;
-
-		mCurrentRetiringPoolItems = new HashMap<>();
-		mRetiringLastAccessIndex = new LastAccessIndex();
-		mRetiringReservations = new PoolReservations();
-		mRetiringPoolItems = 0;
-
-		mCurrentTerminalPoolItems = new HashMap<> ();
-		mTerminalReservations = new PoolReservations();
 		
-		if (mPoolItemRetiringThreads == null || mPoolItemRetiringThreads.length < 1) {
-			sLogger.error("PoolItem Cleanup Threads are not defined!");
+		for (int i = 0; i < mSubPoolLevels; i++) {
+			mSubPoolVars[i].mPoolItems = new HashMap <> ();
+			mSubPoolVars[i].mPoolItemLastAccessIndexes = new LastAccessIndex();
+			mSubPoolVars[i].mResurrectionReservations = new PoolReservations();
+			mSubPoolVars[i].mCount = 0;
+			mSubPoolVars[i].mPoolItemResurrectionThreads = new LinkedList <> ();
+			mSubPoolVars[i].mPoolItemRetirementThreads = new LinkedList <> ();
+		}
+		
+//		mDrainVars.mPoolItemResurrectionThreads = new LinkedList <> ();
+//		mDrainVars.mPoolItemRetirementThreads = new LinkedList <> ();
 
+		
+		//Start the ActiveCleanupThreads
+		IPoolItemRetiringThreadFactory lPoolItemRetiringThreadFactory = null;
+		try {
+			lPoolItemRetiringThreadFactory = (IPoolItemRetiringThreadFactory) 
+					mActivePoolVars.mPoolItemRetirementThreadClassFactory.getDeclaredConstructor(new Class [] {}).newInstance(new Object [] {});
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e) {
 			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
-			throw new PoolException();
+			throw new PoolException (e);
 		}
 
-		//Start the CleanupThreads
-		for (int i = 0; i < mPoolItemRetiringThreads.length; i++) {
-			mPoolItemRetiringThreads[i].start();
+		for (int i = 0; i < mActivePoolVars.mPoolItemRetirementThreadCount; i++) {
+			IPoolItemRetiringThread lPoolItemRetiringThread = lPoolItemRetiringThreadFactory.createPoolItemRetiringThread(this);
+			
+			lPoolItemRetiringThread.start();
+			
+			mActivePoolVars.mPoolItemRetirementThreads.add (lPoolItemRetiringThread);
+			
 		}
 
+		//Start the SubPoolCleanupThreads
+		for (int j = 0 ; j < mSubPoolLevels; j++) {
+			lPoolItemRetiringThreadFactory = null;
+			try {
+				lPoolItemRetiringThreadFactory = (IPoolItemRetiringThreadFactory) 
+						mSubPoolVars[j].mPoolItemRetirementThreadClassFactory.getDeclaredConstructor(new Class [] {}).newInstance(new Object [] {});
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+					| NoSuchMethodException | SecurityException e) {
+				if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+					sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+				}
+				throw new PoolException (e);
+			}
+	
+			for (int i = 0; i < mSubPoolVars[i].mPoolItemRetirementThreadCount; i++) {
+				IPoolItemRetiringThread lPoolItemRetiringThread = lPoolItemRetiringThreadFactory.createPoolItemRetiringThread(this);
+				
+				lPoolItemRetiringThread.start();
+				
+				mSubPoolVars[j].mPoolItemRetirementThreads.add (lPoolItemRetiringThread);
+				
+			}
+		}
+
+//		//Start the DrainCleanupThreads
+//		lPoolItemRetiringThreadFactory = null;
+//		try {
+//			lPoolItemRetiringThreadFactory = (IPoolItemRetiringThreadFactory) 
+//					mDrainVars.mPoolItemRetirementThreadClassFactory.getDeclaredConstructor(new Class [] {}).newInstance(new Object [] {});
+//		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+//				| NoSuchMethodException | SecurityException e) {
+//			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+//				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+//			}
+//			throw new PoolException (e);
+//		}
+//
+//		for (int i = 0; i < mDrainVars.mPoolItemRetirementThreadCount; i++) {
+//			IPoolItemRetiringThread lPoolItemRetiringThread = lPoolItemRetiringThreadFactory.createPoolItemRetiringThread(this);
+//			
+//			lPoolItemRetiringThread.start();
+//			
+//			mDrainVars.mPoolItemRetirementThreads.add (lPoolItemRetiringThread);
+//			
+//		}
+		
 		mPoolState = POOLSTATE.READY;
 		sLogger.debug("Pool is entering READY State");
 		
@@ -129,7 +292,7 @@ public abstract class Pool implements IPool, IKnowledgeBaseObject {
 
 	
 	@SuppressWarnings("squid:S3776") //ignoring complexity rule only
-	public IPoolItem reservePoolItem(String pPoolItemId, IPoolItemTask pTask) throws PoolException {
+	public IPoolItem reservePoolItem(String pPoolItemId, IPoolItemOperationsTask pTask) throws PoolException {
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
@@ -144,85 +307,151 @@ public abstract class Pool implements IPool, IKnowledgeBaseObject {
 		
 		IPoolItem lPoolItem = null;
 
-		while (true) {
-			synchronized (mPoolLock) {
-				// first check if the Pool Item is unreserved
-				lPoolItem = mCurrentActiveUnReservedPoolItems.remove(pPoolItemId);
-				if (lPoolItem != null) {
-					mActiveLastAccessIndex.resetLastAccessedIndexEntry(lPoolItem); // Reset Last Access Index
-					mCurrentActiveReservedPoolItems.put(lPoolItem.getPoolItemId(), lPoolItem); // Place into Reserved List
+		synchronized (mPoolLock) {
+			// 1 check if the Pool Item is in the Active Pool and Unreserved
+			lPoolItem = mActivePoolVars.mUnReservedPoolItems.remove(pPoolItemId);
+			if (lPoolItem != null) {
+				mActivePoolVars.mPoolItemLastAccessIndexes.resetLastAccessedIndexEntry(lPoolItem); // Reset Pool Item Index in Active Pool
+				mActivePoolVars.mReservedPoolItems.put(lPoolItem.getPoolItemId(), lPoolItem); // Place into Active Pool Reserved List
 
-					pTask.setReservedPoolItem(lPoolItem);
+				pTask.setReservedPoolItem(lPoolItem);
 
-					if (sLogger.isDebugEnabled()) {
-						sLogger.debug("{} StateA1: Lock Obtained for Task: {} Thread: {}", lPoolItem.getPoolItemId(),
-								pTask.getTaskName(), pTask.getTaskThreadName());
-					}
-
-					if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
-						sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
-					}
-
-					return lPoolItem;
+				if (sLogger.isDebugEnabled()) {
+					sLogger.debug("{} State Active-Reserve-1: PoolItem is already instantiated and now reserved in Active Pool: {} Thread: {}", lPoolItem.getPoolItemId(),
+							pTask.getTaskName(), pTask.getTaskThread().getName());
 				}
 
-				// second check if the Pool Item is reserved
-				lPoolItem = mCurrentActiveReservedPoolItems.get(pPoolItemId);
-				if (lPoolItem != null) {
-					mActiveLastAccessIndex.resetLastAccessedIndexEntry(lPoolItem); // Reset Last Access Index
-					mActiveReservations.addReservation(new PoolReservation(lPoolItem, pTask)); // Add to the Reservation
-																								// List
-
-					if (sLogger.isDebugEnabled()) {
-						sLogger.debug("{} StateA2: Reservation Obtained for Task: {} Thread: {}",
-								lPoolItem.getPoolItemId(), pTask.getTaskName(), pTask.getTaskThreadName());
-					}
-
-					if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
-						sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
-					}
-
-					return null;
+				if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+					sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 				}
 
-				// third check if the Pool Item is in the middle of being retired
-				lPoolItem = mCurrentRetiringPoolItems.get(pPoolItemId);
-				if (lPoolItem != null) {
-					mRetiringReservations.addReservation(new PoolReservation(lPoolItem, pTask));
-					// you don't need to reset the Last Access Index for a file in the middle of
-					// being retired
+				return lPoolItem;
+			}
 
-					if (sLogger.isDebugEnabled()) {
-						sLogger.debug("{} StateA3: PoolItem is currently being retired for Task: {} Thread: {}",
-								lPoolItem.getPoolItemId(), pTask.getTaskName(), pTask.getTaskThreadName());
-					}
+			// 2 check if the Pool Item is in the Active Pool and Reserved
+			lPoolItem = mActivePoolVars.mReservedPoolItems.get(pPoolItemId);
+			if (lPoolItem != null) {
+				mActivePoolVars.mPoolItemLastAccessIndexes.resetLastAccessedIndexEntry(lPoolItem); // Reset Pool Item Index in Active Pool
+				mActivePoolVars.mReservations.addReservation(new PoolReservation(lPoolItem, pTask)); // Add to the Reservation List
 
-					if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
-						sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
-					}
-
-					return null;
+				if (sLogger.isDebugEnabled()) {
+					sLogger.debug("{} State Active-Reserve-2: PoolItem is already instantiated and now queued for reservation in Active Pool: {} Thread: {}", lPoolItem.getPoolItemId(),
+							pTask.getTaskName(), pTask.getTaskThread().getName());
 				}
 
-				if (mActivePoolItems < mActiveHighWaterMark) {
-					lPoolItem = addNewPoolItemToPool(pPoolItemId, pTask);
-
-					if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
-						sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
-					}
-					return lPoolItem;
+				if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+					sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 				}
 
+				return null;
+			}
+
+			// 3 check if the Pool Item is in the Active Pool and in the middle of being retired
+			lPoolItem = mActivePoolVars.mRetiringPoolItems.get(pPoolItemId);
+			if (lPoolItem != null) {
+				mActivePoolVars.mResurrectionReservations.addReservation(new PoolReservation(lPoolItem, pTask));
+				// you don't need to reset the Last Access Index for a file in the middle of being retired
+
+				if (sLogger.isDebugEnabled()) {
+					sLogger.debug("{} State Active-Reserve-3: PoolItem is currently being retired in Active Pool and Queued for Resurrection: {} Thread: {}", lPoolItem.getPoolItemId(),
+							pTask.getTaskName(), pTask.getTaskThread().getName());
+				}
+
+				if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+					sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+				}
+
+				return null;
+			}
+		}
+
+		// Okay so we know the PoolItem is not in the active pool.
+		// 4A Check if you have reached the active pool high water mark.  if so pause because otherwise you will overflow the ActivePool
+		boolean lWait = true;
+		while (lWait) {
+			synchronized (mPoolLock)  {
+				if (mActivePoolVars.mCount >= mActivePoolVars.mHighWaterMark) {
+					lWait = true;
+				} else {
+					// Add 1 to active count
+					mActivePoolVars.mCount++;
+					lWait = false;
+				}
+			}
+			if (lWait) {
+				if (sLogger.isDebugEnabled()) {
+					sLogger.debug("{} Transition State Active-Reserve-4A: HighWaterMark reached: Active Pool Count {} Active Pool High Water Mark {} {} Thread: {}", lPoolItem.getPoolItemId(),
+						mActivePoolVars.mCount, mActivePoolVars.mHighWaterMark, pTask.getTaskName(), pTask.getTaskThread().getName());
+				}
 				try {
-					sLogger.debug("HighWaterMark reached: HighWaterMark {} PoolItems Count {}", mActiveHighWaterMark,
-							mActivePoolItems);
 					wait(10000);
 				} catch (InterruptedException e) {
 					Thread.currentThread().interrupt();
 					sLogger.error("Thread interrupted", e);
 				}
+			} else {
+				// 4B Okay so the Active Pool is now below the HighWaterMark so continue
+				if (sLogger.isDebugEnabled()) {
+					sLogger.debug("{} Transition State Active-Reserve-4B: HighWaterMark not reached: Active Pool Count {} Active Pool High Water Mark {} {} Thread: {}", lPoolItem.getPoolItemId(),
+						mActivePoolVars.mCount, mActivePoolVars.mHighWaterMark, pTask.getTaskName(), pTask.getTaskThread().getName());
+				}
 			}
 		}
+		
+		synchronized (mPoolLock) {
+			//5 check SubPools for PoolItem
+			for (int i = 0; i < mSubPoolLevels; i++) {
+				// 5A check SubPool for PoolItem
+				lPoolItem = mSubPoolVars[i].mPoolItems.remove(pPoolItemId);
+				if (lPoolItem != null) {
+					sLogger.debug("{} State Active-Reserve-5A: PoolItem is currently in SubPool {} and Now Queued in Active Pool for Resurrection: {} Thread: {}", lPoolItem.getPoolItemId(),
+							i, pTask.getTaskName(), pTask.getTaskThread().getName());
+					
+					// TODO Create initialization thread & task
+					
+					// Add Initial Task to Active Resurrection
+					mActivePoolVars.mRetiringPoolItems.put(pPoolItemId, lPoolItem);
+					mActivePoolVars.mResurrectionReservations.addReservation(new PoolReservation(lPoolItem, pTask));
+										
+					// TODO Start initialization thread & task
+					
+					// TODO initialization thread & task Initiates call back function to place in reserved and start reservation task and reduce Sub Pool count (not here) and reindex in Active Thread
+					
+					if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+						sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+					}
+					return null;
+				}
+			
+				// 5B check SubPool for Retirement
+				lPoolItem = mSubPoolVars[i].mRetiringPoolItems.get(pPoolItemId);
+				if (lPoolItem != null) {
+					if (sLogger.isDebugEnabled()) {
+						sLogger.debug("{} State Active-Reserve-5B: PoolItem is currently being retired in Sub Pool {} and Queued for Resurrection: {} Thread: {}", lPoolItem.getPoolItemId(),
+								i, pTask.getTaskName(), pTask.getTaskThread().getName());
+					}
+
+					mSubPoolVars[i].mResurrectionReservations.addReservation(new PoolReservation(lPoolItem, pTask));
+					
+					if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+						sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+					}
+
+					return null;
+				}
+			}		
+		
+			
+			//6 either been drained or never instantiated
+			//TODO create initialization thread
+			
+			
+		}
+		
+		
+		
+		
+		
 	}
 
 	private IPoolItem addNewPoolItemToPool(String pPoolItemId, IPoolItemTask pTask) throws PoolException {
@@ -230,26 +459,23 @@ public abstract class Pool implements IPool, IKnowledgeBaseObject {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
-		// Okay the Pool Item does not exist, so we need to create it
-		IPoolItem lPoolItem = initializePoolItem(pPoolItemId);
-
-		if (lPoolItem == null) {
-			sLogger.error("Pool Item failed to initialize");
-
-			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
-				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
-			}
-			throw new PoolException();
-		}
-
-		mCurrentActiveReservedPoolItems.put(pPoolItemId, lPoolItem);
-		mActiveLastAccessIndex.addLastAccessedIndexEntry(lPoolItem); // Add to the Last Access Index
-		mActivePoolItems++;
+		// TODO Create initialization thread & task
+		
+		//TODO Create PoolItem but do not initialize
+		IPoolItem lPoolItem = null; //this should not be null
+		
+		// Add Initial Task to Active Resurrection
+		mActivePoolVars.mRetiringPoolItems.put(pPoolItemId, lPoolItem); //Add to the retiring pool item list temporarily.  The call back function will put the real poolItem in.
+		mActivePoolVars.mResurrectionReservations.addReservation(new PoolReservation(lPoolItem, pTask));
+							
+		// TODO Start initialization thread & task
+		
+		// TODO initialization thread & task Initiates call back function to place in reserved and start reservation task and reduce Sub Pool count (not here) and reindex in Active Thread
 
 		if (sLogger.isDebugEnabled()) {
 			sLogger.debug("{} StateA4: PoolItem is instantiated and reserved for Task: {} Thread: {}",
 					lPoolItem.getPoolItemId(), pTask.getTaskName(), pTask.getTaskThreadName());
-		}
+
 
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
@@ -258,7 +484,12 @@ public abstract class Pool implements IPool, IKnowledgeBaseObject {
 
 	}
 
+	
+	
 	protected abstract IPoolItem initializePoolItem(String pPoolItemId);
+	
+	
+	
 
 	public void releasePoolItem(IPoolItem pPoolItem) throws PoolException {
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
@@ -417,6 +648,111 @@ public abstract class Pool implements IPool, IKnowledgeBaseObject {
 
 		}
 	}
+	
+	
+	@SuppressWarnings("squid:S3776") //ignoring complexity rule only
+	public void retireActivePoolItem(String pPoolItemId) throws PoolException {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
+		}
+
+		if (mPoolState != POOLSTATE.READY || mPoolState != POOLSTATE.RETIRING) {
+			sLogger.error("Pool is not in a ready state!  GO AWAY! State: {} ", mPoolState);
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+			}
+			throw new PoolException();
+		}
+		
+		synchronized (mPoolLock) {
+			IPoolItem lPoolItemToRetire = mActivePoolVars.mRetiringPoolItems.remove(pPoolItemId);
+			if (lPoolItemToRetire == null) {
+				sLogger.error("{} Pool Item to Retire is not found in the Retiring List", pPoolItemId);
+
+				if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+					sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+				}
+				throw new PoolException();
+			}
+
+			IPoolReservation lPoolReservation = mActivePoolVars.mResurrectionReservations.popReservation(lPoolItemToRetire);
+
+			if (lPoolReservation == null) {
+				sLogger.debug("{} State Active-Retire-1: PoolItem is retired without Resurrection", pPoolItemId);
+				if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+					sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+				}
+				mActivePoolVars.mCount--;
+				notifyAll();
+				return;
+			}
+			
+			if (mPoolState != POOLSTATE.RETIRED) {
+				// Guess what... we gotta reinstantiate and requeue the reservations
+
+				IPoolItemOperationsTask lResurrectedPoolItemTask = lPoolReservation.getTask();
+				
+				IPoolItem lResurrectedPoolItem = addNewPoolItemToPool(pPoolItemId, lResurrectedPoolItemTask);
+
+				//TODO Take the Resurrected Pool item and invoke the initialization factory....				
+				lResurrectedPoolItemTask.setReservedPoolItem(lResurrectedPoolItem);
+				lResurrectedPoolItemTask.notifyAll();
+
+				// Put all Resurrection Reservations back to Active Reservations
+				lPoolReservation = mActivePoolVars.mResurrectionReservations.popReservation(lPoolItemToRetire);
+				while (lPoolReservation != null) {
+					lResurrectedPoolItemTask = lPoolReservation.getTask();
+					IPoolReservation lResurrectedPoolReservation = new PoolReservation(lResurrectedPoolItem,
+							lResurrectedPoolItemTask);
+					mActivePoolVars.mReservations.addReservation(lResurrectedPoolReservation);
+					lPoolReservation = mActivePoolVars.mResurrectionReservations.popReservation(lPoolItemToRetire);
+				}
+
+				sLogger.debug("{} State Active-Retire-2: PoolItem is retired but is resurrected.", pPoolItemId);
+				if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+					sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+				}
+			} else {
+				sLogger.debug("{} State Active-Retire-3: PoolItem is retired. Pool is retiring", pPoolItemId);
+				if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+					sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+				}
+				mActivePoolVars.mCount--;
+			}
+
+		}
+
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+		}
+	}
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 	public synchronized void retire() throws PoolException {
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {

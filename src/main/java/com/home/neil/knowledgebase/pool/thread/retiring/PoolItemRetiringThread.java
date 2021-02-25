@@ -27,4 +27,5 @@ public abstract class PoolItemRetiringThread extends SteppedThrottledAppThread {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
 	}
+
 }

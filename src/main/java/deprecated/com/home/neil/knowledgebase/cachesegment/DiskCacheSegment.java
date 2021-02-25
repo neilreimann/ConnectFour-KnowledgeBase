@@ -1,4 +1,4 @@
-package com.home.neil.knowledgebase.cachesegment;
+package deprecated.com.home.neil.knowledgebase.cachesegment;
 
 import java.io.IOException;
 import java.util.zip.DataFormatException;
@@ -9,7 +9,10 @@ import org.apache.logging.log4j.Logger;
 
 import com.home.neil.knowledgebase.IKnowledgeBaseObject;
 import com.home.neil.knowledgebase.KnowledgeBaseException;
-import com.home.neil.knowledgebase.cachesegment.memory.MemoryCacheSegment.MEMORYCACHESTATE;
+import com.home.neil.knowledgebase.cachesegment.CacheSegmentStateException;
+import com.home.neil.knowledgebase.cachesegment.IReadWriteCacheSegment;
+
+import deprecated.com.home.neil.knowledgebase.cachesegment.memory.MemoryCacheSegment.MEMORYCACHESTATE;
 
 public class DiskCacheSegment implements IReadWriteCacheSegment, IKnowledgeBaseObject{
 	public static final String CLASS_NAME = DiskCacheSegment.class.getName();

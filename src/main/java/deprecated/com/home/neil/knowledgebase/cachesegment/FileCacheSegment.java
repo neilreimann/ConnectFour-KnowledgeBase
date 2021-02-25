@@ -1,4 +1,4 @@
-package com.home.neil.knowledgebase.cachesegment.file;
+package deprecated.com.home.neil.knowledgebase.cachesegment;
 
 import java.io.File;
 
