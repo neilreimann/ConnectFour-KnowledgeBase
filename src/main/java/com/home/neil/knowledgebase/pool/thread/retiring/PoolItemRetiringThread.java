@@ -13,8 +13,9 @@ public abstract class PoolItemRetiringThread extends SteppedThrottledAppThread {
 	public static final Logger sLogger = LogManager.getLogger(PACKAGE_NAME);
 
 	protected IPool mPool = null;
+	protected int mSubPoolLevel = -1;
 	
-	public PoolItemRetiringThread(IPool pPool, String pLogContext, int pMaxThrottleCount, int pThrottleValue) {
+	protected PoolItemRetiringThread(IPool pPool, int pSubPoolLevel,String pLogContext, int pMaxThrottleCount, int pThrottleValue) {
 		super(false, pThrottleValue, pMaxThrottleCount, pLogContext, true);
 		
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
@@ -22,6 +23,7 @@ public abstract class PoolItemRetiringThread extends SteppedThrottledAppThread {
 		}
 		
 		mPool = pPool;
+		mSubPoolLevel = pSubPoolLevel;
 		
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);

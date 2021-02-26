@@ -14,18 +14,20 @@ import com.home.neil.task.SteppedThrottledAppTask;
 import com.home.neil.task.TaskException;
 import com.home.neil.thread.SteppedThrottledAppThread;
 
-public abstract class PoolItemRetiringTask extends SteppedThrottledAppTask implements IPoolItemRetiringTask {
+public  class PoolItemRetiringTask extends SteppedThrottledAppTask implements IPoolItemRetiringTask {
 	public static final String CLASS_NAME = PoolItemRetiringTask.class.getName();
 	public static final String PACKAGE_NAME = CLASS_NAME.substring(0, CLASS_NAME.lastIndexOf("."));
 	public static Logger sLogger = LogManager.getLogger(PACKAGE_NAME);
 	
 	protected IPool mPool = null;
+	protected int mSubPoolLevel = -1;
 	
-	protected PoolItemRetiringTask(IPool pPool, SteppedThrottledAppThread pSteppedThrottledAppThread, String pLogContext,
+	protected PoolItemRetiringTask(IPool pPool, int pSubPoolLevel, SteppedThrottledAppThread pSteppedThrottledAppThread, String pLogContext,
 			boolean pRecordTaskStatistics) {
 		super(pSteppedThrottledAppThread, pLogContext, pRecordTaskStatistics);
 
 		mPool = pPool;
+		mSubPoolLevel = pSubPoolLevel;
 	}
 
 	protected void executeTask() throws TaskException {
@@ -85,8 +87,9 @@ public abstract class PoolItemRetiringTask extends SteppedThrottledAppTask imple
 	}
 
 
-	@Override
 	public IPool getPool() {
 		return mPool;
 	}
+
+
 }
