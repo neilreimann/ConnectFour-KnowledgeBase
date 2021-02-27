@@ -35,6 +35,24 @@ public abstract class PoolItemInitializationTask extends BasicAppTask implements
 		}
 	}
 
+	protected PoolItemInitializationTask(IPool pPool, IPoolItem pPoolItem, String pLogContext, boolean pRecordThreadStatistics) {
+		super(pLogContext, pRecordThreadStatistics);
+		
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
+		}
+		
+		mPool = pPool;
+		mPoolItemId = pPoolItem.getPoolItemId();
+		mPoolItem = pPoolItem;
+		mPoolItemOperationsTask = null;
+		
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+		}
+	}
+	
+	
 	public IPool getPool() {
 		return mPool;
 	}
@@ -47,9 +65,9 @@ public abstract class PoolItemInitializationTask extends BasicAppTask implements
 		return mPoolItemOperationsTask;
 	}
 	
+	@Override
 	public IPoolItem getPoolItem() {
-		return null;
+		return mPoolItem;
 	}
-
-
+	
 }

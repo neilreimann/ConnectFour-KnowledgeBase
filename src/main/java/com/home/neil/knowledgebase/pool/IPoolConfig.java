@@ -2,7 +2,7 @@ package com.home.neil.knowledgebase.pool;
 
 import com.home.neil.appconfig.DefaultConfigValue;
 
-public interface PoolConfig {
+public interface IPoolConfig {
 
 	public int getActiveHighWaterMark ();
 	public int getActiveLowWaterMark();

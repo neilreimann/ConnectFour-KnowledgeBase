@@ -14,7 +14,7 @@ import com.home.neil.task.SteppedThrottledAppTask;
 import com.home.neil.task.TaskException;
 import com.home.neil.thread.SteppedThrottledAppThread;
 
-public  class PoolItemRetiringTask extends SteppedThrottledAppTask implements IPoolItemRetiringTask {
+public abstract class PoolItemRetiringTask extends SteppedThrottledAppTask implements IPoolItemRetiringTask {
 	public static final String CLASS_NAME = PoolItemRetiringTask.class.getName();
 	public static final String PACKAGE_NAME = CLASS_NAME.substring(0, CLASS_NAME.lastIndexOf("."));
 	public static Logger sLogger = LogManager.getLogger(PACKAGE_NAME);
@@ -38,7 +38,7 @@ public  class PoolItemRetiringTask extends SteppedThrottledAppTask implements IP
 		List<IPoolItem> lPoolItemsToRetire = null;
 		
 		try {
-			lPoolItemsToRetire = mPool.getRetiringPoolItems(0);
+			lPoolItemsToRetire = mPool.getRetiringPoolItems(mSubPoolLevel);
 		} catch (PoolException e) {
 			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
@@ -72,7 +72,7 @@ public  class PoolItemRetiringTask extends SteppedThrottledAppTask implements IP
 			}
 			
 			try {
-				mPool.retirePoolItem(0, lPoolItemToRetire.getPoolItemId());
+				mPool.retirePoolItemFromPoolCallback(mSubPoolLevel, lPoolItemToRetire.getPoolItemId());
 			} catch (PoolException e) {
 				mTaskSuccessful = false;
 				sLogger.error("PoolException occurred when attempting to retire Pool Item from Pool.  Level {}  PoolItemId {}", 0, lPoolItemToRetire.getPoolItemId());

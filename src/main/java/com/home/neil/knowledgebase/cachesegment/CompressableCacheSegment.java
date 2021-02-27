@@ -781,7 +781,7 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 		}
 	}
 
-	public void retireCritical() throws CacheSegmentStateException {
+	private void retireCritical() throws CacheSegmentStateException {
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}

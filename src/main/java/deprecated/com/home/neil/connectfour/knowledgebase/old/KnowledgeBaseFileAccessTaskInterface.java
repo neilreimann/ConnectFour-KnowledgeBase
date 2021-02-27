@@ -1,4 +1,4 @@
-package com.home.neil.connectfour.knowledgebase.old;
+package deprecated.com.home.neil.connectfour.knowledgebase.old;
 
 
 public interface KnowledgeBaseFileAccessTaskInterface {

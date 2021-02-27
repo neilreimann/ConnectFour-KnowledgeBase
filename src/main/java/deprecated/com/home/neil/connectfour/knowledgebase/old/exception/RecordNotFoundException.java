@@ -1,4 +1,4 @@
-package com.home.neil.connectfour.knowledgebase.old.exception;
+package deprecated.com.home.neil.connectfour.knowledgebase.old.exception;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

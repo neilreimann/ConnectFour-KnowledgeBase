@@ -1,4 +1,4 @@
-package com.home.neil.connectfour.knowledgebase.old;
+package deprecated.com.home.neil.connectfour.knowledgebase.old;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -16,7 +16,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.home.neil.appmanager.ApplicationPrecompilerSettings;
-import com.home.neil.connectfour.knowledgebase.old.exception.KnowledgeBaseException;
+
+import deprecated.com.home.neil.connectfour.knowledgebase.old.exception.KnowledgeBaseException;
 
 public class KnowledgeBaseFile {
 	public static final String CLASS_NAME = KnowledgeBaseFile.class.getName();

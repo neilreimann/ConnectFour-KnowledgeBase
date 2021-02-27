@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.home.neil.knowledgebase.pool.task.IPoolItemTask;
+import com.home.neil.knowledgebase.pool.thread.operations.IPoolItemOperationsTask;
 
 public class PoolReservation implements IPoolReservation {
 	public static final String CLASS_NAME = PoolReservation.class.getName();
@@ -11,9 +12,9 @@ public class PoolReservation implements IPoolReservation {
 	public static final Logger sLogger = LogManager.getLogger(PACKAGE_NAME);
 	
 	public IPoolItem mPoolItem = null;
-	public IPoolItemTask mTask = null;
+	public IPoolItemOperationsTask mTask = null;
 	
-	public PoolReservation (IPoolItem pPoolItem, IPoolItemTask pTask) {
+	public PoolReservation (IPoolItem pPoolItem, IPoolItemOperationsTask pTask) {
 		mPoolItem = pPoolItem;
 		mTask = pTask;
 	}
@@ -22,7 +23,7 @@ public class PoolReservation implements IPoolReservation {
 		return mPoolItem;
 	}
 
-	public IPoolItemTask getTask() {
+	public IPoolItemOperationsTask getTask() {
 		return mTask;
 	}
 

@@ -1,11 +1,12 @@
-package com.home.neil.connectfour.knowledgebase.old;
+package deprecated.com.home.neil.connectfour.knowledgebase.old;
 
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.home.neil.appmanager.ApplicationPrecompilerSettings;
-import com.home.neil.connectfour.knowledgebase.old.exception.KnowledgeBaseException;
+
+import deprecated.com.home.neil.connectfour.knowledgebase.old.exception.KnowledgeBaseException;
 
 public abstract class KnowledgeBaseFileAccessTask implements KnowledgeBaseFileAccessTaskInterface {
 	public static final String CLASS_NAME = KnowledgeBaseFileAccessTask.class.getName();

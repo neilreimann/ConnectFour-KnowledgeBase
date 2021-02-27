@@ -1,4 +1,4 @@
-package com.home.neil.connectfour.knowledgebase.old;
+package deprecated.com.home.neil.connectfour.knowledgebase.old;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -14,8 +14,9 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
 
 import com.home.neil.appmanager.ApplicationPrecompilerSettings;
-import com.home.neil.connectfour.knowledgebase.old.exception.KnowledgeBaseException;
 import com.home.neil.thread.performancemetrics.ThreadPerformanceMetricsMBean;
+
+import deprecated.com.home.neil.connectfour.knowledgebase.old.exception.KnowledgeBaseException;
 
 public class KnowledgeBaseFileAccessReadEvaluatedTask extends KnowledgeBaseFileAccessEvaluatedTask {
 	public static final String SIMPLE_CLASS_NAME = KnowledgeBaseFileAccessReadEvaluatedTask.class.getSimpleName();

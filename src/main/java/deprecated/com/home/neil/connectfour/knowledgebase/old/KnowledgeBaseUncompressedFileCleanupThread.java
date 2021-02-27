@@ -1,4 +1,4 @@
-package com.home.neil.connectfour.knowledgebase.old;
+package deprecated.com.home.neil.connectfour.knowledgebase.old;
 
 import java.io.IOException;
 import java.io.PrintWriter;

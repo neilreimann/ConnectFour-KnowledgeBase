@@ -27,6 +27,10 @@ public class CompressableCacheSegmentPoolItemIndexEntry extends IndexEntry imple
 	public CompressableCacheSegment getCompressableCacheSegment() {
 		return mCompressableCacheSegment;
 	}
+	
+	public void setCompressableCacheSegment (CompressableCacheSegment pCompressableCacheSegment) {
+		mCompressableCacheSegment = pCompressableCacheSegment;
+	}
 
 	@Override
 	public String getPoolItemId() {

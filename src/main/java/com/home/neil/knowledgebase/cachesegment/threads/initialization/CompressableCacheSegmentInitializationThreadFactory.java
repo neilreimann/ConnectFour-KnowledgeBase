@@ -4,11 +4,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.home.neil.appmanager.ApplicationPrecompilerSettings;
+import com.home.neil.knowledgebase.cachesegment.CompressableCacheSegmentPoolItemIndexEntry;
 import com.home.neil.knowledgebase.cachesegment.threads.operations.CompressableCacheSegmentOperationsTask;
 import com.home.neil.knowledgebase.pool.IPool;
-import com.home.neil.knowledgebase.pool.thread.initialization.IPoolItemInitializationTask;
+import com.home.neil.knowledgebase.pool.IPoolItem;
 import com.home.neil.knowledgebase.pool.thread.initialization.IPoolItemInitializationThread;
 import com.home.neil.knowledgebase.pool.thread.initialization.IPoolItemInitializationThreadFactory;
+import com.home.neil.knowledgebase.pool.thread.operations.IPoolItemOperationsTask;
 
 public class CompressableCacheSegmentInitializationThreadFactory implements IPoolItemInitializationThreadFactory {
 	public static final String CLASS_NAME = CompressableCacheSegmentInitializationThreadFactory.class.getName();
@@ -19,14 +21,14 @@ public class CompressableCacheSegmentInitializationThreadFactory implements IPoo
 		// Do Nothing, this is just a factory class
 	}
 	
-	public IPoolItemInitializationThread getCompressableCacheSegmentInitializationThread(
-			IPool pPool, String pPoolItemId, IPoolItemInitializationTask pPoolItemOperationsTask, String pLogContext) {
+	public IPoolItemInitializationThread getInitializationThread(
+			IPool pPool, String pPoolItemId, IPoolItemOperationsTask pPoolItemOperationsTask) {
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
 		IPoolItemInitializationThread lAppInitializationTask = new CompressableCacheSegmentInitializationThread(pPool, pPoolItemId,
-				(CompressableCacheSegmentOperationsTask) pPoolItemOperationsTask, pLogContext);
+				(CompressableCacheSegmentOperationsTask) pPoolItemOperationsTask, null);
 
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
@@ -34,4 +36,21 @@ public class CompressableCacheSegmentInitializationThreadFactory implements IPoo
 		return lAppInitializationTask;
 
 	}
+	
+	
+	public IPoolItemInitializationThread getInitializationThread(
+			IPool pPool, IPoolItem pPoolItem) {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
+		}
+
+		IPoolItemInitializationThread lAppInitializationTask = new CompressableCacheSegmentInitializationThread(pPool, (CompressableCacheSegmentPoolItemIndexEntry) pPoolItem, null);
+
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+		}
+		return lAppInitializationTask;
+
+	}
+
 }

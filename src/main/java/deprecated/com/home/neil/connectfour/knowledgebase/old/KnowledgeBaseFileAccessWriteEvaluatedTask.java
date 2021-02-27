@@ -1,4 +1,4 @@
-package com.home.neil.connectfour.knowledgebase.old;
+package deprecated.com.home.neil.connectfour.knowledgebase.old;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -14,12 +14,13 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
 
 import com.home.neil.appmanager.ApplicationPrecompilerSettings;
-import com.home.neil.connectfour.knowledgebase.old.exception.KnowledgeBaseException;
 import com.home.neil.thread.performancemetrics.ThreadPerformanceMetricsMBean;
 
-public class KnowledgeBaseFileAccessReadTask extends KnowledgeBaseFileAccessTask {
-	public static final String SIMPLE_CLASS_NAME = KnowledgeBaseFileAccessReadTask.class.getSimpleName();
-	public static final String CLASS_NAME = KnowledgeBaseFileAccessReadTask.class.getName();
+import deprecated.com.home.neil.connectfour.knowledgebase.old.exception.KnowledgeBaseException;
+
+public class KnowledgeBaseFileAccessWriteEvaluatedTask extends KnowledgeBaseFileAccessEvaluatedTask {
+	public static final String SIMPLE_CLASS_NAME = KnowledgeBaseFileAccessWriteEvaluatedTask.class.getSimpleName();
+	public static final String CLASS_NAME = KnowledgeBaseFileAccessWriteEvaluatedTask.class.getName();
 	public static final String PACKAGE_NAME = CLASS_NAME.substring(0, CLASS_NAME.lastIndexOf("."));
 	public static Logger sLogger = LogManager.getLogger(PACKAGE_NAME);
 
@@ -48,35 +49,20 @@ public class KnowledgeBaseFileAccessReadTask extends KnowledgeBaseFileAccessTask
 		}
 
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
-			sLogger.trace("Exiting");
+			sLogger.debug("Exiting");
 		}
 	}
 
-	public KnowledgeBaseFileAccessReadTask(KnowledgeBaseFilePool pKnowledgeBaseFilePool, String pStateString, String pMoveString, byte pBoardScore, String pLogContext) throws ConfigurationException, KnowledgeBaseException  {
-		super(pKnowledgeBaseFilePool, pStateString, pMoveString, pLogContext);
+	public KnowledgeBaseFileAccessWriteEvaluatedTask(KnowledgeBaseFilePool pKnowledgeBaseFilePool, String pStateString, String pActionString, byte pEvaluationThreadInfo, String pLogContext) throws ConfigurationException, KnowledgeBaseException {
+		super(pKnowledgeBaseFilePool, pStateString, pActionString, pLogContext);
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
 
-		if (pBoardScore == 0) {
-			mBoardScore = 120;
-		} else {
-			mBoardScore = pBoardScore;
-		}
+		mEvaluationThreadInfo = pEvaluationThreadInfo;
 
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
-			sLogger.trace("Exiting");
-		}
-	}
-
-	public KnowledgeBaseFileAccessReadTask(KnowledgeBaseFilePool pKnowledgeBaseFilePool, String pStateString, String pMoveString, String pLogContext) throws ConfigurationException, KnowledgeBaseException  {
-		super(pKnowledgeBaseFilePool, pStateString, pMoveString, pLogContext);
-		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
-			sLogger.trace("Entering");
-		}
-
-		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
-			sLogger.trace("Exiting");
+			sLogger.debug("Exiting");
 		}
 	}
 
@@ -84,20 +70,19 @@ public class KnowledgeBaseFileAccessReadTask extends KnowledgeBaseFileAccessTask
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
-
 		if (sLogMetrics) {
 			mTaskStartTime = new GregorianCalendar().getTimeInMillis();
-			sLogger.debug("Thread: " + getTaskName() + " is starting at " + mTaskStartTime);
+			sLogger.debug("Task: " + getTaskName() + " is starting at " + mTaskStartTime);
 		}
 
 		try {
 			try {
 				if (sLogger.isDebugEnabled()) {
-					sLogger.debug("Read file: " + mFileLocation + " at Location: " + Long.toHexString(mFileIndex));
+					sLogger.debug("Update file: " + mFileLocation + " at Location: " + Long.toHexString(mFileIndex));
 				}
-				readScore();
+				updateScore();
 			} catch (IOException eIO) {
-				sLogger.error("Read file: " + mFileLocation + " at Location: " + Long.toHexString(mFileIndex) + " IO Exception occurred!");
+				sLogger.error("Update file: " + mFileLocation + " at Location: " + Long.toHexString(mFileIndex) + " IO Exception occurred!");
 				sLogger.error("IOException Occurred when reading score: Message: " + eIO.getMessage());
 
 				StringWriter lSW = new StringWriter();
@@ -108,7 +93,7 @@ public class KnowledgeBaseFileAccessReadTask extends KnowledgeBaseFileAccessTask
 
 				mTransactionSuccessful = false;
 			} catch (KnowledgeBaseException eKBE) {
-				sLogger.error("Read file: " + mFileLocation + " at Location: " + Long.toHexString(mFileIndex) + " Knowledge Base Exception occurred!");
+				sLogger.error("Update file:  " + mFileLocation + " at Location: " + Long.toHexString(mFileIndex) + " Knowledge Base Exception occurred!");
 				sLogger.error("Knowledge Base Occurred when reading score: Message: " + eKBE.getMessage());
 
 				StringWriter lSW = new StringWriter();
@@ -119,7 +104,7 @@ public class KnowledgeBaseFileAccessReadTask extends KnowledgeBaseFileAccessTask
 
 				mTransactionSuccessful = false;
 			} catch (ConfigurationException eCE) {
-				sLogger.error("Read file: " + mFileLocation + " at Location: " + Long.toHexString(mFileIndex) + " Knowledge Base Exception occurred!");
+				sLogger.error("Update file: " + mFileLocation + " at Location: " + Long.toHexString(mFileIndex) + " Knowledge Base Exception occurred!");
 				sLogger.error("Knowledge Base Occurred when reading score: Message: " + eCE.getMessage());
 
 				StringWriter lSW = new StringWriter();
@@ -130,6 +115,7 @@ public class KnowledgeBaseFileAccessReadTask extends KnowledgeBaseFileAccessTask
 
 				mTransactionSuccessful = false;
 			}
+
 		} catch (Exception eE) {
 			sLogger.error("Unanticipated Exception occurred during Thread Execution!");
 			sLogger.error("Exception Message: " + eE.getMessage());
@@ -147,7 +133,7 @@ public class KnowledgeBaseFileAccessReadTask extends KnowledgeBaseFileAccessTask
 		if (sLogMetrics) {
 
 			mTaskEndTime = new GregorianCalendar().getTimeInMillis();
-			sLogger.debug("Task: " + getTaskName() + " is ending at " + mTaskEndTime);
+			sLogger.debug("Thread: " + getTaskName() + " is ending at " + mTaskEndTime);
 			long lDuration = mTaskEndTime - mTaskStartTime;
 
 			try {
@@ -173,94 +159,87 @@ public class KnowledgeBaseFileAccessReadTask extends KnowledgeBaseFileAccessTask
 			}
 		}
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
-			sLogger.trace("Exiting");
+			sLogger.debug("Exiting");
 		}
 	}
 
-	public void readScore() throws IOException, KnowledgeBaseException, ConfigurationException, DataFormatException  {
+	public void updateScore() throws IOException, KnowledgeBaseException, ConfigurationException, DataFormatException  {
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
+		
 		mCurrentThread = Thread.currentThread();
-
 		KnowledgeBaseFilePool lKnowledgeBaseFilePool = KnowledgeBaseFilePool.getMasterInstance();
 		boolean lGotKnowledgeBaseFile = lKnowledgeBaseFilePool.reserveKnowledgeBaseFile(mFileDirectory, mFileLocation, this);
 		if (!lGotKnowledgeBaseFile) {
 			while (mKnowledgeBaseFileInUse == null) {
-				//sLogger.error("spinlock");
-
-				// try {
-				// Thread.sleep(10000);
-				// } catch (InterruptedException eIE) {
-				// //
-				// sLogger.debug("Unanticipated Interrupt exception occurred!");
-				// //
-				// // StringWriter lSW = new StringWriter();
-				// // PrintWriter lPW = new PrintWriter(lSW);
-				// // eIE.printStackTrace(lPW);
-				// // lSW.toString(); // stack trace as a string
-				// // sLogger.debug("StackTrace: " + lSW);
-				// }
+//				try {
+//					Thread.sleep(10000);
+//				} catch (InterruptedException eIE) {
+//					// sLogger.debug("Unanticipated Interrupt exception occurred!");
+//					//
+//					// StringWriter lSW = new StringWriter();
+//					// PrintWriter lPW = new PrintWriter(lSW);
+//					// eIE.printStackTrace(lPW);
+//					// lSW.toString(); // stack trace as a string
+//					// sLogger.debug("StackTrace: " + lSW);
+//
+//					// Thread.currentThread().interrupt();
+//				}
 			}
 		}
 
 		if (mKnowledgeBaseFileInUse == null) {
-			sLogger.error("Read file: " + mFileLocation + " at Location: " + Integer.toHexString(mFileIndex) + " COULD NOT GET THE FILES RESERVED!");
+			sLogger.error("Update file: " + mFileLocation + " at Location: " + Long.toHexString(mFileIndex) + " COULD NOT GET THE FILES RESERVED!");
 			mTransactionSuccessful = false;
 			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
-				sLogger.trace("Exiting");
+				sLogger.debug("Exiting");
 			}
 			return;
 		}
-		byte lBoardScoreToRead = mKnowledgeBaseFileInUse.readScore(mFileIndex);
 
-		if (lBoardScoreToRead == 0) {
-			if (sLogger.isDebugEnabled()) {
-				sLogger.debug("Read file: " + mFileLocation + " at Location: " + Integer.toHexString(mFileIndex) + " Score not found.");
-			}
-			mScoreFound = false;
-		} else if (lBoardScoreToRead == 120) {
-			if (sLogger.isDebugEnabled()) {
-				sLogger.debug("Read file: " + mFileLocation + " at Location: " + Integer.toHexString(mFileIndex) + " Score read: " + lBoardScoreToRead);
-			}
-			mBoardScore = 0;
-			mScoreFound = true;
-		} else {
-			if (sLogger.isDebugEnabled()) {
-				sLogger.debug("Read file: " + mFileLocation + " at Location: " + Integer.toHexString(mFileIndex) + " Score found: " + lBoardScoreToRead);
-			}
-			mBoardScore = lBoardScoreToRead;
-			mScoreFound = true;
+		mKnowledgeBaseFileInUse.writeScore(mFileIndex, mEvaluationThreadInfo);
+		if (sLogger.isDebugEnabled()) {
+			sLogger.debug("Update file: " + mFileLocation + " at Location: " + Long.toHexString(mFileIndex) + " Evaluation written: " + mEvaluationThreadInfo);
 		}
-
 		lKnowledgeBaseFilePool.releaseKnowledgeBaseFile(mKnowledgeBaseFileInUse);
 
 		mTransactionSuccessful = true;
 
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
-			sLogger.trace("Exiting");
+			sLogger.debug("Exiting");
 		}
 		return;
 	}
 
-	public void interrupt() {
+	public boolean isTransactionSuccessful() {
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace("Entering");
 		}
-		mCurrentThread.interrupt();
+		sLogger.debug("Exiting");
+		return mTransactionSuccessful;
+	}
+
+	public byte getEvaluationThreadInfo() {
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
-			sLogger.trace("Exiting");
+			sLogger.trace("Entering");
 		}
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.debug("Exiting");
+		}
+		return mEvaluationThreadInfo;
+	}
+
+	public void interrupt() {
+		sLogger.trace("Entering");
+		mCurrentThread.interrupt();
+		sLogger.trace("Exiting");
 	}
 
 	@Override
 	public String getWaitingThreadName() {
-		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
-			sLogger.trace("Entering");
-		}
-		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
-			sLogger.trace("Exiting");
-		}
+		sLogger.trace("Entering");
+		sLogger.trace("Exiting");
 		return mCurrentThread.getName();
 	}
 
