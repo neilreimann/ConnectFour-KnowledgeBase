@@ -17,7 +17,7 @@ import com.home.neil.thread.SteppedThrottledAppThread;
 public abstract class PoolItemRetiringTask extends SteppedThrottledAppTask implements IPoolItemRetiringTask {
 	public static final String CLASS_NAME = PoolItemRetiringTask.class.getName();
 	public static final String PACKAGE_NAME = CLASS_NAME.substring(0, CLASS_NAME.lastIndexOf("."));
-	public static Logger sLogger = LogManager.getLogger(PACKAGE_NAME);
+	public static final Logger sLogger = LogManager.getLogger(PACKAGE_NAME);
 	
 	protected IPool mPool = null;
 	protected int mSubPoolLevel = -1;

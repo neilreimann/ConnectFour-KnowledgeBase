@@ -17,12 +17,11 @@ public class CompressableCacheSegmentInitializationThreadFactory implements IPoo
 	public static final String PACKAGE_NAME = CLASS_NAME.substring(0, CLASS_NAME.lastIndexOf("."));
 	public static final Logger sLogger = LogManager.getLogger(PACKAGE_NAME);
 
-	public CompressableCacheSegmentInitializationThreadFactory () {
+	public CompressableCacheSegmentInitializationThreadFactory() {
 		// Do Nothing, this is just a factory class
 	}
-	
-	public IPoolItemInitializationThread getInitializationThread(
-			IPool pPool, String pPoolItemId, IPoolItemOperationsTask pPoolItemOperationsTask) {
+
+	public IPoolItemInitializationThread getInitializationThread(IPool pPool, String pPoolItemId, IPoolItemOperationsTask pPoolItemOperationsTask) {
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
@@ -36,15 +35,14 @@ public class CompressableCacheSegmentInitializationThreadFactory implements IPoo
 		return lAppInitializationTask;
 
 	}
-	
-	
-	public IPoolItemInitializationThread getInitializationThread(
-			IPool pPool, IPoolItem pPoolItem) {
+
+	public IPoolItemInitializationThread getInitializationThread(IPool pPool, IPoolItem pPoolItem) {
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
-		IPoolItemInitializationThread lAppInitializationTask = new CompressableCacheSegmentInitializationThread(pPool, (CompressableCacheSegmentPoolItemIndexEntry) pPoolItem, null);
+		IPoolItemInitializationThread lAppInitializationTask = new CompressableCacheSegmentInitializationThread(pPool,
+				(CompressableCacheSegmentPoolItemIndexEntry) pPoolItem, null);
 
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);

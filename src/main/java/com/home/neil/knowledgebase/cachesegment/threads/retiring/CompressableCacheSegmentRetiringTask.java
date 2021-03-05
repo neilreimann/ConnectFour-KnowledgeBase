@@ -15,12 +15,12 @@ import com.home.neil.thread.SteppedThrottledAppThread;
 public class CompressableCacheSegmentRetiringTask extends PoolItemRetiringTask {
 	public static final String CLASS_NAME = CompressableCacheSegmentRetiringTask.class.getName();
 	public static final String PACKAGE_NAME = CLASS_NAME.substring(0, CLASS_NAME.lastIndexOf("."));
-	public static Logger sLogger = LogManager.getLogger(PACKAGE_NAME);
-	
-	protected CompressableCacheSegmentRetiringTask(IPool pPool, int pSubPoolLevel, SteppedThrottledAppThread pSteppedThrottledAppThread,
-			String pLogContext, boolean pRecordTaskStatistics) {
+	public static final Logger sLogger = LogManager.getLogger(PACKAGE_NAME);
+
+	protected CompressableCacheSegmentRetiringTask(IPool pPool, int pSubPoolLevel, SteppedThrottledAppThread pSteppedThrottledAppThread, String pLogContext,
+			boolean pRecordTaskStatistics) {
 		super(pPool, pSubPoolLevel, pSteppedThrottledAppThread, pLogContext, pRecordTaskStatistics);
-		
+
 	}
 
 	@Override
@@ -28,25 +28,25 @@ public class CompressableCacheSegmentRetiringTask extends PoolItemRetiringTask {
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
-		
+
 		CompressableCacheSegmentPoolItemIndexEntry lPoolItem = (CompressableCacheSegmentPoolItemIndexEntry) pPoolItem;
-		
+
 		CompressableCacheSegment lCompressableCacheSegment = lPoolItem.getCompressableCacheSegment();
 		switch (mSubPoolLevel) {
 		case 0:
 			lCompressableCacheSegment.saveUncompressedMemoryToUncompressedFile();
 			break;
 		case 1:
-			lCompressableCacheSegment.saveUncompressedFileToCompressedMemory();;
-		break;
+			lCompressableCacheSegment.saveUncompressedFileToCompressedMemory();
+			break;
 		case 2:
 			lCompressableCacheSegment.saveCompressedMemoryToCompressedFile();
-			break;	
+			break;
 		default:
 			lCompressableCacheSegment.retire();
-			break;	
+			break;
 		}
-		
+
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}

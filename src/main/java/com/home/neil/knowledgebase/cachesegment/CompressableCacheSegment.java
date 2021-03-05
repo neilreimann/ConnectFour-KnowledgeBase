@@ -27,44 +27,44 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 	public enum COMPRESSABLECACHESEGMENTSTATE {
 		UNINSTANTIATED, INSTANTIATED, COMPRESSEDFILE, COMPRESSEDMEMORY, UNCOMPRESSEDFILE, READY, RETIRED, ERROR
 	}
-	
+
 	// COMPRESSEDFILE State Variables
 	private class CompressedFileStateVars {
 
 		private String mBasePath = null;
 		private String[] mStatePaths = null;
 		private String mFileName = null;
-		
+
 		private String mFullPathDirectoryName = null;
 		private String mFullPathFileName = null;
 
 		private File mFullPathFile = null;
 		private File mFullPathDirectory = null;
 	}
-	
+
 	// COMPRESSEDMEMORY State Variables
 	private class CompressedMemoryStateVars {
 		private byte[] mCacheSegmentBytes = null;
 		private boolean mCacheSegmentDirty = false;
 	}
-	
+
 	// UNCOMPRESSEDFILE State Variables
 	private class UncompressedFileStateVars {
 		private String mBasePath = null;
 		private String[] mStatePaths = null;
 		private String mFileName = null;
-	
+
 		private String mFullPathDirectoryName = null;
 		private String mFullPathFileName = null;
 		private String mFullPathDebugFileName = null;
-	
+
 		private File mFullPathFile = null;
 		private File mFullPathDebugFile = null;
 		private File mFullPathDirectory = null;
-	
+
 		private boolean mCacheSegmentDirty = false;
 	}
-	
+
 	// READY State Variables
 	private class UncompressedMemoryStateVars {
 		private byte[] mCacheSegmentBytes = null;
@@ -79,14 +79,12 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 
 	private CompressedFileStateVars mCompressedFileStateVars = null;
 	private CompressedMemoryStateVars mCompressedMemoryStateVars = null;
-	private UncompressedFileStateVars mUncompressedFileStateVars = null; 
+	private UncompressedFileStateVars mUncompressedFileStateVars = null;
 	private UncompressedMemoryStateVars mUncompressedMemoryStateVars = null;
-	
+
 	// Thread Safety Variables
 	private final Object mCacheSegmentStateLock = new Object();
 	private boolean mThreadSafe = false;
-
-
 
 	public CompressableCacheSegment(CompressableCacheSegmentConfig pConfig, String[] pStatePaths, String pFileName) {
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
@@ -97,9 +95,9 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 		mCompressedMemoryStateVars = new CompressedMemoryStateVars();
 		mUncompressedFileStateVars = new UncompressedFileStateVars();
 		mUncompressedMemoryStateVars = new UncompressedMemoryStateVars();
-				
+
 		mCompressedFileStateVars.mBasePath = pConfig.getCompressedFileBasePath();
-		
+
 		mCompressedFileStateVars.mBasePath = pConfig.getCompressedFileBasePath();
 		mCompressedFileStateVars.mStatePaths = pStatePaths;
 		mCompressedFileStateVars.mFileName = pFileName;
@@ -107,10 +105,10 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 
 		StringBuilder lCompressedFilePathBuilder = new StringBuilder();
 		for (String lStatePath : mCompressedFileStateVars.mStatePaths) {
-			  lCompressedFilePathBuilder.append("/" + lStatePath);
+			lCompressedFilePathBuilder.append("/" + lStatePath);
 		}
 		mCompressedFileStateVars.mFullPathFileName += lCompressedFilePathBuilder.toString();
-		
+
 		mCompressedFileStateVars.mFullPathDirectoryName = mCompressedFileStateVars.mFullPathFileName;
 		mCompressedFileStateVars.mFullPathFileName += "/" + mCompressedFileStateVars.mFileName + "." + pConfig.getCompressedFileExtension();
 
@@ -119,8 +117,6 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 
 		mCacheSegmentUncompressedSize = pConfig.getCacheSegmentUncompressedSize();
 
-		
-		
 		mUncompressedFileStateVars.mBasePath = pConfig.getUncompressedFileBasePath();
 		mUncompressedFileStateVars.mStatePaths = pStatePaths;
 		mUncompressedFileStateVars.mFileName = pFileName;
@@ -132,10 +128,10 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 		for (String lStatePath : mUncompressedFileStateVars.mStatePaths) {
 			lUncompressedFilePathBuilder.append("/" + lStatePath);
 		}
-		
+
 		mUncompressedFileStateVars.mFullPathFileName += lUncompressedFilePathBuilder.toString();
 		mUncompressedFileStateVars.mFullPathDebugFileName += lUncompressedFilePathBuilder.toString();
-		
+
 		mUncompressedFileStateVars.mFullPathFileName += "/" + pFileName + "." + pConfig.getUncompressedFileExtension();
 		mUncompressedFileStateVars.mFullPathDebugFileName += "/" + pFileName + "." + pConfig.getUncompressedFileDebugExtension();
 
@@ -147,7 +143,7 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 		mThreadSafe = pConfig.getThreadSafe();
 
 		mCacheSegmentState = COMPRESSABLECACHESEGMENTSTATE.INSTANTIATED;
-		
+
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
@@ -177,8 +173,7 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 		}
 
 		if (mCacheSegmentState != COMPRESSABLECACHESEGMENTSTATE.INSTANTIATED) {
-			sLogger.error("CompressableCacheSegment is not in a INSTANTIATED state!  GO AWAY! State: {} ",
-					mCacheSegmentState);
+			sLogger.error("CompressableCacheSegment is not in a INSTANTIATED state!  GO AWAY! State: {} ", mCacheSegmentState);
 			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
@@ -218,8 +213,7 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
-			throw new CacheSegmentStateException(
-					"CompressableCacheSegment is not in a instantiated state!  GO AWAY! State: " + mCacheSegmentState);
+			throw new CacheSegmentStateException("CompressableCacheSegment is not in a instantiated state!  GO AWAY! State: " + mCacheSegmentState);
 		}
 
 		mUncompressedMemoryStateVars.mCacheSegmentBytes = new byte[mCacheSegmentUncompressedSize];
@@ -255,10 +249,8 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
-		if (mCacheSegmentState != COMPRESSABLECACHESEGMENTSTATE.COMPRESSEDFILE ||
-				mCacheSegmentState != COMPRESSABLECACHESEGMENTSTATE.COMPRESSEDMEMORY || 
-				mCacheSegmentState != COMPRESSABLECACHESEGMENTSTATE.UNCOMPRESSEDFILE ||
-				mCacheSegmentState != COMPRESSABLECACHESEGMENTSTATE.READY) {
+		if (mCacheSegmentState != COMPRESSABLECACHESEGMENTSTATE.COMPRESSEDFILE || mCacheSegmentState != COMPRESSABLECACHESEGMENTSTATE.COMPRESSEDMEMORY
+				|| mCacheSegmentState != COMPRESSABLECACHESEGMENTSTATE.UNCOMPRESSEDFILE || mCacheSegmentState != COMPRESSABLECACHESEGMENTSTATE.READY) {
 			sLogger.error("CompressableCacheSegment is not in a COMPRESSEDFILE, COMPRESSEDMEMORY, UNCOMPRESSEDFILE OR READY state!  GO AWAY! State: {} ",
 					mCacheSegmentState);
 			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
@@ -267,15 +259,14 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 			throw new CacheSegmentStateException();
 		}
 
-		
 		if (mCacheSegmentState != COMPRESSABLECACHESEGMENTSTATE.COMPRESSEDFILE) {
 			loadCompressedFileToCompressedMemory();
 		}
-	
+
 		if (mCacheSegmentState != COMPRESSABLECACHESEGMENTSTATE.COMPRESSEDMEMORY) {
 			loadCompressedMemoryToUncompressedFile();
 		}
-		
+
 		if (mCacheSegmentState != COMPRESSABLECACHESEGMENTSTATE.UNCOMPRESSEDFILE) {
 			loadUncompressedFileToUncompressedMemory();
 		}
@@ -284,7 +275,7 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 		}
 	}
-	
+
 	// The State Transitions
 	public void loadCompressedFileToCompressedMemory() throws CacheSegmentStateException {
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
@@ -309,19 +300,15 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
-		if (mCacheSegmentState != COMPRESSABLECACHESEGMENTSTATE.COMPRESSEDFILE ||
-				mCacheSegmentState != COMPRESSABLECACHESEGMENTSTATE.INSTANTIATED) {
+		if (mCacheSegmentState != COMPRESSABLECACHESEGMENTSTATE.COMPRESSEDFILE || mCacheSegmentState != COMPRESSABLECACHESEGMENTSTATE.INSTANTIATED) {
 			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
-			throw new CacheSegmentStateException(
-					"CompressableCacheSegment is not in a COMPRESSEDFILE state!  GO AWAY! State: "
-							+ mCacheSegmentState);
+			throw new CacheSegmentStateException("CompressableCacheSegment is not in a COMPRESSEDFILE state!  GO AWAY! State: " + mCacheSegmentState);
 		}
 
 		try (FileInputStream lFileIn = new FileInputStream(mCompressedFileStateVars.mFullPathFileName);
-				BufferedInputStream lBIS = new BufferedInputStream(lFileIn,
-						(int) mCompressedFileStateVars.mFullPathFile.length());) {
+				BufferedInputStream lBIS = new BufferedInputStream(lFileIn, (int) mCompressedFileStateVars.mFullPathFile.length());) {
 
 			mCompressedMemoryStateVars.mCacheSegmentBytes = new byte[(int) mCompressedFileStateVars.mFullPathFile.length()];
 
@@ -383,9 +370,7 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
-			throw new CacheSegmentStateException(
-					"CompressableCacheSegment is not in a COMPRESSEDMEMORY state!  GO AWAY! State: "
-							+ mCacheSegmentState);
+			throw new CacheSegmentStateException("CompressableCacheSegment is not in a COMPRESSEDMEMORY state!  GO AWAY! State: " + mCacheSegmentState);
 		}
 
 		mUncompressedFileStateVars.mFullPathDirectory.mkdirs();
@@ -454,9 +439,7 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
 
-			throw new CacheSegmentStateException(
-					"CompressableCacheSegment is not in a UNCOMPRESSEDFILE state!  GO AWAY! State: "
-							+ mCacheSegmentState);
+			throw new CacheSegmentStateException("CompressableCacheSegment is not in a UNCOMPRESSEDFILE state!  GO AWAY! State: " + mCacheSegmentState);
 		}
 
 		try (FileInputStream lFileIn = new FileInputStream(mUncompressedFileStateVars.mFullPathFileName);
@@ -514,7 +497,7 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 		}
 	}
 
-	@SuppressWarnings("squid:S3776") //ignoring complexity rule only
+	@SuppressWarnings("squid:S3776") // ignoring complexity rule only
 	private void saveUncompressedMemoryToUncompressedFileCritical() throws CacheSegmentStateException {
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
@@ -525,8 +508,7 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
 
-			throw new CacheSegmentStateException(
-					"CompressableCacheSegment is not in a READY state!  GO AWAY! State: " + mCacheSegmentState);
+			throw new CacheSegmentStateException("CompressableCacheSegment is not in a READY state!  GO AWAY! State: " + mCacheSegmentState);
 		}
 
 		if (mUncompressedMemoryStateVars.mCacheSegmentDirty) {
@@ -597,7 +579,7 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 		}
 	}
 
-	@SuppressWarnings("squid:S3776") //ignoring complexity rule only
+	@SuppressWarnings("squid:S3776") // ignoring complexity rule only
 	private void saveUncompressedFileToCompressedMemoryCritical() throws CacheSegmentStateException {
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
@@ -608,8 +590,7 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
 
-			throw new CacheSegmentStateException(
-					"CompressableCacheSegment is not in a READY state!  GO AWAY! State: " + mCacheSegmentState);
+			throw new CacheSegmentStateException("CompressableCacheSegment is not in a READY state!  GO AWAY! State: " + mCacheSegmentState);
 		}
 
 		if (mUncompressedFileStateVars.mCacheSegmentDirty) {
@@ -654,7 +635,7 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 				mCacheSegmentState = COMPRESSABLECACHESEGMENTSTATE.ERROR;
 				throw new CacheSegmentStateException(e);
 			}
-			
+
 			sLogger.debug("Compressing Dirty Cache Segment");
 
 			if (sLogger.isDebugEnabled()) {
@@ -680,7 +661,7 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 				mCacheSegmentState = COMPRESSABLECACHESEGMENTSTATE.ERROR;
 				throw new CacheSegmentStateException(e);
 			}
-			
+
 			mCompressedMemoryStateVars.mCacheSegmentDirty = false;
 		}
 
@@ -710,7 +691,7 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 		}
 	}
 
-	@SuppressWarnings("squid:S3776") //ignoring complexity rule only
+	@SuppressWarnings("squid:S3776") // ignoring complexity rule only
 	private void saveCompressedMemoryToCompressedFileCritical() throws CacheSegmentStateException {
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
@@ -720,9 +701,7 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
-			throw new CacheSegmentStateException(
-					"CompressableCacheSegment is not in a COMPRESSEDMEMORY state!  GO AWAY! State: "
-							+ mCacheSegmentState);
+			throw new CacheSegmentStateException("CompressableCacheSegment is not in a COMPRESSEDMEMORY state!  GO AWAY! State: " + mCacheSegmentState);
 		}
 
 		if (mCompressedMemoryStateVars.mCacheSegmentDirty) {
@@ -799,8 +778,7 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 		}
 
 		if (mCacheSegmentState != COMPRESSABLECACHESEGMENTSTATE.COMPRESSEDFILE) {
-			sLogger.error("CompressableCacheSegment is not in a COMPRESSEDFILE state!  GO AWAY! State: {} ",
-					mCacheSegmentState);
+			sLogger.error("CompressableCacheSegment is not in a COMPRESSEDFILE state!  GO AWAY! State: {} ", mCacheSegmentState);
 			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
@@ -820,7 +798,7 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 		}
 
 		byte[] lScoreRead = null;
-		
+
 		if (mThreadSafe) {
 			synchronized (mCacheSegmentStateLock) {
 				lScoreRead = readScoreCritical(pFileIndex, pSize);
@@ -836,8 +814,7 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 		return lScoreRead;
 	}
 
-	
-	private byte[] readScoreCritical (int pFileIndex, int pSize) throws CacheSegmentStateException {
+	private byte[] readScoreCritical(int pFileIndex, int pSize) throws CacheSegmentStateException {
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
@@ -848,8 +825,7 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
-			throw new CacheSegmentStateException(
-					"Cache Segment is not in a ready state!  GO AWAY! State: " + mCacheSegmentState);
+			throw new CacheSegmentStateException("Cache Segment is not in a ready state!  GO AWAY! State: " + mCacheSegmentState);
 		}
 		for (int i = 0; i < pSize; i++) {
 			lScoreRead[i] = mUncompressedMemoryStateVars.mCacheSegmentBytes[pFileIndex + i];
@@ -864,8 +840,7 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 
 		return lScoreRead;
 	}
-	
-	
+
 	public void writeScore(int pFileIndex, byte[] pScoreToWrite, int pSize) throws CacheSegmentStateException {
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
@@ -878,7 +853,6 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 		} else {
 			writeScoreCritical(pFileIndex, pScoreToWrite, pSize);
 		}
-
 
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
@@ -894,8 +868,7 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
-			throw new CacheSegmentStateException(
-					"Cache Segment is not in a ready state!  GO AWAY! State: " + mCacheSegmentState);
+			throw new CacheSegmentStateException("Cache Segment is not in a ready state!  GO AWAY! State: " + mCacheSegmentState);
 		}
 
 		for (int i = 0; i < pSize; i++) {
@@ -918,7 +891,6 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
-		
 		switch (mCacheSegmentState) {
 		case COMPRESSEDFILE:
 		case UNCOMPRESSEDFILE:
@@ -944,6 +916,6 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 			}
 			return false;
 		}
-	}	
-	
+	}
+
 }

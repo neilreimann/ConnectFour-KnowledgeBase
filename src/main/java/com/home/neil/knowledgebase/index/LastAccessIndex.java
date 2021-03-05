@@ -19,7 +19,7 @@ public class LastAccessIndex implements ILastAccessIndex {
 	
 	private final Object mLastAccessIndexLock = new Object();
 	
-	private TreeSet <IIndexEntry> mIndexEntries = new TreeSet <IIndexEntry> (new IIndexEntryComparator());
+	private TreeSet <IIndexEntry> mIndexEntries = new TreeSet <> (new IIndexEntryComparator());
 
 	public void addLastAccessedIndexEntry(IIndexEntry pIndexEntry) {
 		synchronized(mLastAccessIndexLock) {

@@ -15,9 +15,13 @@ public abstract class PoolItemOperationsTask extends BasicAppTask implements IPo
 	public static final String PACKAGE_NAME = CLASS_NAME.substring(0, CLASS_NAME.lastIndexOf("."));
 	public static final Logger sLogger = LogManager.getLogger(PACKAGE_NAME);
 	
-	public IPoolItem mReservedPoolItem = null;
-	public String mPoolItemId = null;
-	public IPool mPool = null;
+	protected IPoolItem mReservedPoolItem = null;
+	protected String mPoolItemId = null;
+	protected IPool mPool = null;
+	
+	private static final String LOG_COULDNOTRESERVEPOOLITEM = "Could not reserve the PoolItem!";
+	
+	private Object mLock = new Object();
 	
 	protected PoolItemOperationsTask(IPool pPool, String pPoolItemId, String pLogContext, boolean pRecordTaskStatistics) {
 		super(pLogContext, pRecordTaskStatistics);
@@ -33,7 +37,9 @@ public abstract class PoolItemOperationsTask extends BasicAppTask implements IPo
 	@Override
 	public void setReservedPoolItem(IPoolItem pReservedPoolItem) {
 		mReservedPoolItem = pReservedPoolItem;
-		notifyAll();
+		synchronized (mLock) {
+			notifyAll();
+		}
 	}
 
 	@Override
@@ -45,7 +51,7 @@ public abstract class PoolItemOperationsTask extends BasicAppTask implements IPo
 		try {
 			mReservedPoolItem = mPool.reservePoolItem(mPoolItemId, this);
 		} catch (PoolException e1) {
-			sLogger.error("Could not reserve the PoolItem!");
+			sLogger.error(LOG_COULDNOTRESERVEPOOLITEM);
 			mTaskSuccessful = false;
 			mTaskFinished = true;
 			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
@@ -54,23 +60,15 @@ public abstract class PoolItemOperationsTask extends BasicAppTask implements IPo
 			return;
 		}
 		
-		if (mReservedPoolItem == null) {
-			try {
-				wait(120000);
-			} catch (InterruptedException e) {
-                Thread.currentThread().interrupt(); 
-                sLogger.error("Thread interrupted", e); 
+		synchronized (mLock) {
+			while (mReservedPoolItem == null) {
+				try {
+					wait(120000);
+				} catch (InterruptedException e) {
+	                Thread.currentThread().interrupt(); 
+	                sLogger.error("Thread interrupted", e); 
+				}
 			}
-		}
-		
-		if (mReservedPoolItem == null) {
-			sLogger.error("Could not reserve the PoolItem!");
-			mTaskSuccessful = false;
-			mTaskFinished = true;
-			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
-				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
-			}
-			return;
 		}
 		
 		try {
@@ -88,12 +86,11 @@ public abstract class PoolItemOperationsTask extends BasicAppTask implements IPo
 		try {
 			mPool.releasePoolItem(mReservedPoolItem);
 		} catch (PoolException e1) {
-			sLogger.error("Could not reserve the PoolItem!");
+			sLogger.error(LOG_COULDNOTRESERVEPOOLITEM);
 			mTaskSuccessful = false;
 			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
-			return;
 		}
 	}
 	

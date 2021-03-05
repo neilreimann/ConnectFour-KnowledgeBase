@@ -25,88 +25,105 @@ public class CompressableCacheSegmentInitializationTask extends PoolItemInitiali
 	public static final String PACKAGE_NAME = CLASS_NAME.substring(0, CLASS_NAME.lastIndexOf("."));
 	public static final Logger sLogger = LogManager.getLogger(PACKAGE_NAME);
 
-	public CompressableCacheSegmentInitializationTask(IPool pPool, String pPoolItemId,
-			CompressableCacheSegmentOperationsTask pPoolItemOperationsTask, String pLogContext) {
+	public CompressableCacheSegmentInitializationTask(IPool pPool, String pPoolItemId, CompressableCacheSegmentOperationsTask pPoolItemOperationsTask,
+			String pLogContext) {
 		super(pPool, pPoolItemId, pPoolItemOperationsTask, pLogContext, true);
-		
+
 		mPoolItem = new CompressableCacheSegmentPoolItemIndexEntry(mPoolItemId, null);
 
 	}
 
-	public CompressableCacheSegmentInitializationTask(IPool pPool, CompressableCacheSegmentPoolItemIndexEntry pPoolItem,
-			String pLogContext) {
+	public CompressableCacheSegmentInitializationTask(IPool pPool, CompressableCacheSegmentPoolItemIndexEntry pPoolItem, String pLogContext) {
 		super(pPool, pPoolItem, pLogContext, true);
 	}
-	
-	
-	
+
+	private void executeInitialization(CompressableCacheSegmentPoolItemIndexEntry pPoolItem) throws TaskException {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
+		}
+
+		CompressableCacheSegmentConfig lConfig = null;
+
+		try {
+			lConfig = AppConfig.bind(CompressableCacheSegmentConfig.class);
+		} catch (NumberFormatException | NoSuchElementException | URISyntaxException | ConfigurationException | IOException e) {
+
+			mTaskSuccessful = false;
+			mTaskFinished = true;
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+			}
+			throw new TaskException(e);
+		}
+
+		CompressableCacheSegmentOperationsTask lTask = (CompressableCacheSegmentOperationsTask) mPoolItemOperationsTask;
+
+		CompressableCacheSegment lCompressableCacheSegment = new CompressableCacheSegment(lConfig, lTask.getStatePaths(), lTask.getFileName());
+
+		try {
+			lCompressableCacheSegment.init();
+		} catch (CacheSegmentStateException e) {
+			mTaskSuccessful = false;
+			mTaskFinished = true;
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+			}
+			throw new TaskException(e);
+		}
+
+		pPoolItem.setCompressableCacheSegment(lCompressableCacheSegment);
+
+		mPool.initPoolItemThreadCallback((IPoolItem) pPoolItem);
+
+		mTaskSuccessful = true;
+		mTaskFinished = true;
+
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+		}
+
+	}
+
+	private void executeReinitialization(CompressableCacheSegmentPoolItemIndexEntry pPoolItem) throws TaskException {
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
+		}
+
+		CompressableCacheSegment lCompressableCacheSegment = pPoolItem.getCompressableCacheSegment();
+
+		try {
+			lCompressableCacheSegment.reinit();
+		} catch (CacheSegmentStateException e) {
+			mTaskSuccessful = false;
+			mTaskFinished = true;
+			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+			}
+			throw new TaskException(e);
+		}
+
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+		}
+	}
+
 	protected void executeTask() throws TaskException {
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
 		CompressableCacheSegmentPoolItemIndexEntry lPoolItem = (CompressableCacheSegmentPoolItemIndexEntry) mPoolItem;
-		
+
 		if (lPoolItem.getCompressableCacheSegment() == null) {
-			CompressableCacheSegmentConfig lConfig = null;
-
-			try {
-				lConfig = AppConfig.bind(CompressableCacheSegmentConfig.class);
-			} catch (NumberFormatException | NoSuchElementException | URISyntaxException | ConfigurationException
-					| IOException e) {
-				if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
-					sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
-				}
-				mTaskSuccessful = false;
-				mTaskFinished = true;
-				throw new TaskException(e);
-			}
-
-			CompressableCacheSegmentOperationsTask lTask = (CompressableCacheSegmentOperationsTask) mPoolItemOperationsTask;
-
-			CompressableCacheSegment lCompressableCacheSegment = new CompressableCacheSegment(lConfig,
-					lTask.getStatePaths(), lTask.getFileName());
-
-			try {
-				lCompressableCacheSegment.init();
-			} catch (CacheSegmentStateException e) {
-				mTaskSuccessful = false;
-				mTaskFinished = true;
-				if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
-					sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
-				}
-				throw new TaskException(e);
-			}
-
-			lPoolItem.setCompressableCacheSegment(lCompressableCacheSegment);
-			
-			mPool.initPoolItemThreadCallback((IPoolItem)lPoolItem);
-
-			mTaskSuccessful = true;
-			mTaskFinished = true;
-
-			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
-				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
-			}
+			executeInitialization(lPoolItem);
 		} else {
-			CompressableCacheSegment lCompressableCacheSegment = lPoolItem.getCompressableCacheSegment();
-			
-			try {
-				lCompressableCacheSegment.reinit();
-			} catch (CacheSegmentStateException e) {
-				mTaskSuccessful = false;
-				mTaskFinished = true;
-				if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
-					sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
-				}
-				throw new TaskException(e);
-			}
+			executeReinitialization(lPoolItem);
 		}
-		
-		
+
+		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
+			sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
+		}
+
 	}
-
-
-
 
 }

@@ -12,7 +12,7 @@ import com.home.neil.task.BasicAppTask;
 public abstract class PoolItemInitializationTask extends BasicAppTask implements IPoolItemInitializationTask {
 	public static final String CLASS_NAME = PoolItemInitializationTask.class.getName();
 	public static final String PACKAGE_NAME = CLASS_NAME.substring(0, CLASS_NAME.lastIndexOf("."));
-	public static Logger sLogger = LogManager.getLogger(PACKAGE_NAME);
+	public static final Logger sLogger = LogManager.getLogger(PACKAGE_NAME);
 	
 	protected IPool mPool = null;
 	protected String mPoolItemId = null;

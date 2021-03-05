@@ -11,7 +11,7 @@ public abstract class IndexEntry implements IIndexEntry {
 	public static final Logger sLogger = LogManager.getLogger(PACKAGE_NAME);
 
 	private long mIndex = 0;
-	private static HashMap<String, Long> sIndex = new HashMap<String, Long>();
+	private static HashMap<String, Long> sIndex = new HashMap<>();
 	
 	protected long setIndexEntry(Class<?> pClass) {
 		mIndex = getNextIndex (pClass);

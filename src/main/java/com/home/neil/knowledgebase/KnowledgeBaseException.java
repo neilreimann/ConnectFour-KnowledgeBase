@@ -11,40 +11,39 @@ import com.home.neil.appmanager.ApplicationPrecompilerSettings;
 public class KnowledgeBaseException extends Exception {
 	private static final long serialVersionUID = -4386957391643467647L;
 	public static final String CLASS_NAME = KnowledgeBaseException.class.getName();
-	public static final String PACKAGE_NAME = CLASS_NAME.substring(0,
-			CLASS_NAME.lastIndexOf("."));
+	public static final String PACKAGE_NAME = CLASS_NAME.substring(0, CLASS_NAME.lastIndexOf("."));
 	public static final Logger sLogger = LogManager.getLogger(PACKAGE_NAME);
-	
-	public KnowledgeBaseException () {
-		super ("KnowledgeBaseException occurred.");
+
+	public KnowledgeBaseException() {
+		super("KnowledgeBaseException occurred.");
 		sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
-		
+
 		StringWriter lSW = new StringWriter();
 		PrintWriter lPW = new PrintWriter(lSW);
 		this.printStackTrace(lPW);
 		lSW.toString(); // stack trace as a string
 		sLogger.error("StackTrace: {} ", lSW);
-		
-		sLogger.error ("KnowledgeBaseException occurred.");
+
+		sLogger.error("KnowledgeBaseException occurred.");
 		sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 	}
 
-	public KnowledgeBaseException (String pMessage) {
-		super (pMessage);
+	public KnowledgeBaseException(String pMessage) {
+		super(pMessage);
 		sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
-		
+
 		StringWriter lSW = new StringWriter();
 		PrintWriter lPW = new PrintWriter(lSW);
 		this.printStackTrace(lPW);
 		lSW.toString(); // stack trace as a string
 		sLogger.error("StackTrace: {} ", lSW);
-		
-		sLogger.error ("{} occurred.", this.getClass().getSimpleName());
+
+		sLogger.error("{} occurred.", this.getClass().getSimpleName());
 		sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 	}
-	
-	public KnowledgeBaseException (Exception pE) {
-		super ("KnowledgeBaseException occurred.  Underlying Exception: "+ pE.getClass().getName());
+
+	public KnowledgeBaseException(Exception pE) {
+		super("KnowledgeBaseException occurred.  Underlying Exception: " + pE.getClass().getName());
 		sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		StringWriter lSW = new StringWriter();
 		PrintWriter lPW = new PrintWriter(lSW);
@@ -55,8 +54,8 @@ public class KnowledgeBaseException extends Exception {
 		sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 	}
 
-	public KnowledgeBaseException (String pMessage, Exception pE) {
-		super (pMessage);
+	public KnowledgeBaseException(String pMessage, Exception pE) {
+		super(pMessage);
 		sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		StringWriter lSW = new StringWriter();
 		PrintWriter lPW = new PrintWriter(lSW);
@@ -67,6 +66,4 @@ public class KnowledgeBaseException extends Exception {
 		sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 	}
 
-
 }
-

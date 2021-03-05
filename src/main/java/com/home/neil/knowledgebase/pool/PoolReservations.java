@@ -11,7 +11,7 @@ public class PoolReservations implements IPoolReservations {
 	public static final String PACKAGE_NAME = CLASS_NAME.substring(0, CLASS_NAME.lastIndexOf("."));
 	public static final Logger sLogger = LogManager.getLogger(PACKAGE_NAME);
 	
-	private HashMap<String, LinkedList<IPoolReservation>> mCurrentReservations = new HashMap<String, LinkedList<IPoolReservation>>();
+	private HashMap<String, LinkedList<IPoolReservation>> mCurrentReservations = new HashMap<>();
 	
 	private final Object mPoolReservationsLock = new Object();
 	
@@ -19,7 +19,7 @@ public class PoolReservations implements IPoolReservations {
 		synchronized (mPoolReservationsLock) {
 			LinkedList<IPoolReservation> lPoolReservations = mCurrentReservations.get(pPoolReservation.getPoolItem().getPoolItemId());
 			if (lPoolReservations == null) {
-				lPoolReservations = new LinkedList<IPoolReservation> ();
+				lPoolReservations = new LinkedList<> ();
 				mCurrentReservations.put(pPoolReservation.getPoolItem().getPoolItemId(), lPoolReservations);
 			} 
 			lPoolReservations.add(pPoolReservation);

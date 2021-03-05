@@ -14,21 +14,22 @@ public class CompressableCacheSegmentPoolItemIndexEntry extends IndexEntry imple
 
 	private CompressableCacheSegment mCompressableCacheSegment = null;
 	private String mPoolItemId = null;
-	
-	public CompressableCacheSegmentPoolItemIndexEntry (String pPoolItemId, CompressableCacheSegment pCompressableCacheSegment) {
+
+	public CompressableCacheSegmentPoolItemIndexEntry(String pPoolItemId, CompressableCacheSegment pCompressableCacheSegment) {
 		mCompressableCacheSegment = pCompressableCacheSegment;
-		setIndexEntry ();
+		mPoolItemId = pPoolItemId;
+		setIndexEntry();
 	}
-	
+
 	public long setIndexEntry() {
-		return setIndexEntry (CompressableCacheSegmentPoolItemIndexEntry.class);
+		return setIndexEntry(CompressableCacheSegmentPoolItemIndexEntry.class);
 	}
-	
+
 	public CompressableCacheSegment getCompressableCacheSegment() {
 		return mCompressableCacheSegment;
 	}
-	
-	public void setCompressableCacheSegment (CompressableCacheSegment pCompressableCacheSegment) {
+
+	public void setCompressableCacheSegment(CompressableCacheSegment pCompressableCacheSegment) {
 		mCompressableCacheSegment = pCompressableCacheSegment;
 	}
 
@@ -39,14 +40,14 @@ public class CompressableCacheSegmentPoolItemIndexEntry extends IndexEntry imple
 
 	@Override
 	public void init() throws KnowledgeBaseException {
-		// TODO Auto-generated method stub
-		
+		// No initialization necessary
+
 	}
 
 	@Override
 	public void retire() throws KnowledgeBaseException {
-		// TODO Auto-generated method stub
-		
+		// No initialization necessary
+
 	}
 
 }

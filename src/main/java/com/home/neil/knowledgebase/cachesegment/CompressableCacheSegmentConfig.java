@@ -12,14 +12,14 @@ public interface CompressableCacheSegmentConfig {
 	
 	public String getUncompressedFileExtension();
 	
-	@DefaultConfigValue (Value = "debug")
+	@DefaultConfigValue (value = "debug")
 	public String getUncompressedFileDebugExtension();
 
 	public int getCacheSegmentUncompressedSize();
 
-	@DefaultConfigValue (Value = "false")
+	@DefaultConfigValue (value = "false")
 	public boolean getDebug();
 
-	@DefaultConfigValue (Value = "false")
+	@DefaultConfigValue (value = "false")
 	public boolean getThreadSafe();
 }
