@@ -131,11 +131,12 @@ class PoolTest extends SandboxTest{
 		component_initPool(lCurrentMethodName, lPool);
 		
 		try {
-			Thread.sleep(30000);
+			Thread.sleep(10000);
 		} catch (InterruptedException e) {
 			Thread.interrupted();
 		}
 		
+		lPool.reservePoolItem(lCurrentMethodName, null)
 		
 		component_retirePool(lCurrentMethodName, lPool);
 		
