@@ -45,7 +45,7 @@ public abstract class PoolItemRetiringTask extends SteppedThrottledAppTask imple
 			}
 			mTaskSuccessful = false;
 			mTaskFinished = true;
-			throw new TaskException ("Pool Exception getting list of Pool Items To Retire", e);
+			return;
 		}
 		
 		if (lPoolItemsToRetire == null || lPoolItemsToRetire.isEmpty()) {

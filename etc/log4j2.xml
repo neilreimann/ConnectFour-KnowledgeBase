@@ -5,7 +5,7 @@
 			<Routes pattern="$${ctx:LogContext}">             
  				<Route key="$${ctx:LogContext}">
 					<RollingFile name="Connect4RollingLogFile-Unknown" 
-							fileName="C:/Personal/Dev/Connect4/KnowledgeBase/logs/Connect4-Unknown.log" 
+							fileName="C:/Personal/dev/workspaces/connect4/ConnectFour-KnowledgeBase/logs/Connect4-Unknown.log" 
 							filePattern="logs/$${date:yyyy-MM}/Connect4-Unknown-%d{yyyy-MM-dd-HH}-%i.log">
 			    		<PatternLayout>
 			        		<Pattern>[%d{ISO8601}] %p [%t] (%F:%L) %m%n</Pattern>
@@ -18,7 +18,7 @@
 				</Route>
  				<Route>
 					<RollingFile name="Connect4RollingLogFile-${ctx:LogContext}" 
-							fileName="C:/Personal/Dev/Connect4/KnowledgeBase/logs/Connect4-${ctx:LogContext}.log" 
+							fileName="C:/Personal/dev/workspaces/connect4/ConnectFour-KnowledgeBase/logs/Connect4-${ctx:LogContext}.log" 
 							filePattern="logs/$${date:yyyy-MM}/Connect4-${ctx:LogContext}-%d{yyyy-MM-dd-HH}-%i.log">
 			    		<PatternLayout>
 							<!-- <Pattern>[%d{ISO8601}] %p [%t]:[CONNECT4] at %C.%M(%F:%L):[%X{ClientSessionID}] %m%n</Pattern> -->

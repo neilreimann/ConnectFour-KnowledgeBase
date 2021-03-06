@@ -8,7 +8,7 @@ import com.home.neil.knowledgebase.pool.IPool;
 import com.home.neil.knowledgebase.pool.thread.IPoolThread;
 import com.home.neil.thread.SteppedThrottledAppThread;
 
-public abstract class PoolItemRetiringThread extends SteppedThrottledAppThread implements IPoolThread {
+public abstract class PoolItemRetiringThread extends SteppedThrottledAppThread implements IPoolItemRetiringThread {
 	public static final String CLASS_NAME = PoolItemRetiringThread.class.getName();
 	public static final String PACKAGE_NAME = CLASS_NAME.substring(0, CLASS_NAME.lastIndexOf("."));
 	public static final Logger sLogger = LogManager.getLogger(PACKAGE_NAME);

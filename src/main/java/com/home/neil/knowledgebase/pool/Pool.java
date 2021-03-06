@@ -13,13 +13,14 @@ import com.home.neil.knowledgebase.IKnowledgeBaseObject;
 import com.home.neil.knowledgebase.KnowledgeBaseException;
 import com.home.neil.knowledgebase.index.ILastAccessIndex;
 import com.home.neil.knowledgebase.index.LastAccessIndex;
+import com.home.neil.knowledgebase.pool.task.IPoolItemTask;
 import com.home.neil.knowledgebase.pool.thread.initialization.IPoolItemInitializationThread;
 import com.home.neil.knowledgebase.pool.thread.initialization.IPoolItemInitializationThreadFactory;
 import com.home.neil.knowledgebase.pool.thread.operations.IPoolItemOperationsTask;
 import com.home.neil.knowledgebase.pool.thread.retiring.IPoolItemRetiringThread;
 import com.home.neil.knowledgebase.pool.thread.retiring.IPoolItemRetiringThreadFactory;
 
-public abstract class Pool implements IPool, IKnowledgeBaseObject {
+public class Pool implements IPool, IKnowledgeBaseObject {
 	public static final String CLASS_NAME = Pool.class.getName();
 	public static final String PACKAGE_NAME = CLASS_NAME.substring(0, CLASS_NAME.lastIndexOf("."));
 	public static final Logger sLogger = LogManager.getLogger(PACKAGE_NAME);
@@ -78,7 +79,7 @@ public abstract class Pool implements IPool, IKnowledgeBaseObject {
 
 //	CONSTRUCTOR LOGIC
 
-	protected Pool(IPoolConfig pPoolConfig) throws PoolException {
+	public Pool(IPoolConfig pPoolConfig) throws PoolException {
 		if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
@@ -722,12 +723,19 @@ public abstract class Pool implements IPool, IKnowledgeBaseObject {
 
 		synchronized (mPoolLock) {
 			// Checking Active Pool to retire
+			int lPoolItemsToTransfer = 0;
+
 			int lPoolItemsOverLowWaterMark = mActivePoolVars.mCount - mActivePoolVars.mLowWaterMark;
+			
+			if (mSubPoolLevels > 0) {
 
-			int lPoolItemsUnderSubPoolWaterMark = mSubPoolVars[0].mHighWaterMarks - mSubPoolVars[0].mCount;
+				int lPoolItemsUnderSubPoolWaterMark = mSubPoolVars[0].mHighWaterMarks - mSubPoolVars[0].mCount;
 
-			int lPoolItemsToTransfer = (lPoolItemsOverLowWaterMark > lPoolItemsUnderSubPoolWaterMark) ? lPoolItemsUnderSubPoolWaterMark
-					: lPoolItemsOverLowWaterMark;
+				lPoolItemsToTransfer = (lPoolItemsOverLowWaterMark > lPoolItemsUnderSubPoolWaterMark) ? lPoolItemsUnderSubPoolWaterMark
+						: lPoolItemsOverLowWaterMark;
+			} else {
+				lPoolItemsToTransfer = lPoolItemsOverLowWaterMark;
+			}
 
 			for (int i = 0; i < lPoolItemsToTransfer; i++) {
 
@@ -777,14 +785,19 @@ public abstract class Pool implements IPool, IKnowledgeBaseObject {
 				// Checking SubPool to retire
 
 				int pSourceSubPoolLevel = pTargetSubPoolLevel - 1;
+				
+				int lPoolItemsToTransfer = 0;
 
 				int lPoolItemsOverLowWaterMark = mSubPoolVars[pSourceSubPoolLevel].mCount - mSubPoolVars[pSourceSubPoolLevel].mLowWaterMarks;
+				
+				if (pTargetSubPoolLevel < mSubPoolLevels) {
+					int lPoolItemsUnderSubPoolWaterMark = mSubPoolVars[pTargetSubPoolLevel].mHighWaterMarks - mSubPoolVars[pTargetSubPoolLevel].mCount;
 
-				int lPoolItemsUnderSubPoolWaterMark = pTargetSubPoolLevel >= mSubPoolLevels ? Integer.MAX_VALUE
-						: mSubPoolVars[pTargetSubPoolLevel].mHighWaterMarks - mSubPoolVars[pTargetSubPoolLevel].mCount; // The Drain is infinite
-
-				int lPoolItemsToTransfer = (lPoolItemsOverLowWaterMark > lPoolItemsUnderSubPoolWaterMark) ? lPoolItemsUnderSubPoolWaterMark
-						: lPoolItemsOverLowWaterMark;
+					lPoolItemsToTransfer = (lPoolItemsOverLowWaterMark > lPoolItemsUnderSubPoolWaterMark) ? lPoolItemsUnderSubPoolWaterMark
+							: lPoolItemsOverLowWaterMark;
+				} else {
+					lPoolItemsToTransfer = lPoolItemsOverLowWaterMark;
+				}
 
 				for (int i = 0; i < lPoolItemsToTransfer; i++) {
 
@@ -1002,7 +1015,7 @@ public abstract class Pool implements IPool, IKnowledgeBaseObject {
 
 		int lCounts = getFullPoolCount();
 
-		while (lCounts >= 0) {
+		while (lCounts > 0) {
 			try {
 				wait(1000);
 			} catch (InterruptedException e) {
@@ -1018,14 +1031,19 @@ public abstract class Pool implements IPool, IKnowledgeBaseObject {
 			lRetiringThread.setTerminate();
 		}
 
+		
+		
 		for (int i = 0; i < mSubPoolLevels; i++) {
 			for (IPoolItemRetiringThread lRetiringThread : mSubPoolVars[i].mPoolItemRetirementThreads) {
 				lRetiringThread.setTerminate();
 			}
 		}
+		
+		
 
 		sLogger.info("Pool Retirement: Retiring Threads terminated.");
 
+		
 		sLogger.debug("Pool is entering RETIRED State");
 		mPoolState = POOLSTATE.RETIRED;
 
@@ -1047,5 +1065,6 @@ public abstract class Pool implements IPool, IKnowledgeBaseObject {
 		sLogger.info("Pool Retirement: Full Count {}", lCounts);
 		return lCounts;
 	}
+
 
 }

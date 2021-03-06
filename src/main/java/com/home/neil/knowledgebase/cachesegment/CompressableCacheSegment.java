@@ -300,11 +300,11 @@ public class CompressableCacheSegment implements IKnowledgeBaseObject, IReadWrit
 			sLogger.trace(ApplicationPrecompilerSettings.TRACE_ENTERING);
 		}
 
-		if (mCacheSegmentState != COMPRESSABLECACHESEGMENTSTATE.COMPRESSEDFILE || mCacheSegmentState != COMPRESSABLECACHESEGMENTSTATE.INSTANTIATED) {
+		if (mCacheSegmentState != COMPRESSABLECACHESEGMENTSTATE.COMPRESSEDFILE && mCacheSegmentState != COMPRESSABLECACHESEGMENTSTATE.INSTANTIATED) {
 			if (ApplicationPrecompilerSettings.TRACE_LOGACTIVE) {
 				sLogger.trace(ApplicationPrecompilerSettings.TRACE_EXITING);
 			}
-			throw new CacheSegmentStateException("CompressableCacheSegment is not in a COMPRESSEDFILE state!  GO AWAY! State: " + mCacheSegmentState);
+			throw new CacheSegmentStateException("CompressableCacheSegment is not in a COMPRESSEDFILE OR INSTANTIATED state!  GO AWAY! State: " + mCacheSegmentState);
 		}
 
 		try (FileInputStream lFileIn = new FileInputStream(mCompressedFileStateVars.mFullPathFileName);

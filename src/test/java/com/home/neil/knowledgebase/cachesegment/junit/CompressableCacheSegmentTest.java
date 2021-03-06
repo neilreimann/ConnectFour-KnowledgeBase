@@ -1,12 +1,11 @@
 package com.home.neil.knowledgebase.cachesegment.junit;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.NoSuchElementException;
 
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -19,97 +18,40 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.home.neil.appconfig.AppConfig;
+import com.home.neil.junit.sandbox.SandboxTest;
 import com.home.neil.knowledgebase.cachesegment.CacheSegmentStateException;
 import com.home.neil.knowledgebase.cachesegment.CompressableCacheSegment;
 import com.home.neil.knowledgebase.cachesegment.CompressableCacheSegmentConfig;
 import com.home.neil.knowledgebase.cachesegment.CompressableCacheSegmentFactory;
 
-class CompressableCacheSegmentJUnit {
-	public static final String CLASS_NAME = CompressableCacheSegmentJUnit.class.getName();
+class CompressableCacheSegmentTest extends SandboxTest {
+	public static final String CLASS_NAME = CompressableCacheSegmentTest.class.getName();
 	public static final String PACKAGE_NAME = CLASS_NAME.substring(0, CLASS_NAME.lastIndexOf("."));
 	public static final Logger sLogger = LogManager.getLogger(PACKAGE_NAME);
 
 	@BeforeAll
-	static void setUpBeforeClass() throws Exception {
+	protected static void setUpBeforeClass() throws Exception {
 	}
 
 	@AfterAll
-	static void tearDownAfterClass() throws Exception {
+	protected static void tearDownAfterClass() throws Exception {
 	}
 
 	@BeforeEach
-	void setUp() throws Exception {
-
+	protected void setUp() throws Exception {
+		super.setUp();
 	}
 
 	@AfterEach
-	void tearDown() throws Exception {
+	protected void tearDown() throws Exception {
 	}
 
-	public void deleteFolderContents(File pFolder) {
-		sLogger.info("Folder to clear: {}", pFolder.getAbsolutePath());
-		assertTrue(pFolder.getAbsolutePath().startsWith("C:\\Personal\\TestingZone\\"));
-
-		File[] pFiles = pFolder.listFiles();
-		if (pFiles != null) { // some JVMs return null for empty dirs
-			for (File lFile : pFiles) {
-				if (!lFile.isDirectory() && lFile.getName().endsWith("dat")) {
-					sLogger.info("Clearing file: {}", lFile.getName());
-					lFile.delete();
-				} else if (!lFile.isDirectory() && lFile.getName().endsWith("cache")) {
-					sLogger.info("Clearing file: {}", lFile.getName());
-					lFile.delete();
-				} else if (!lFile.isDirectory() && lFile.getName().endsWith("debug")) {
-					sLogger.info("Clearing file: {}", lFile.getName());
-					lFile.delete();
-//	            } else if (lFile.isDirectory()) {
-//	            	deleteFolderContents (lFile);
-				}
-			}
-		}
-
-	}
-
-	private void setTestPropertiesFileLocation(String pMethod) {
-		String lPropertiesFile = CLASS_NAME.replaceAll("\\.", "/") + "/" + pMethod + ".properties";
-
-		sLogger.info(lPropertiesFile);
-
-		ClassLoader lClassLoader = this.getClass().getClassLoader();
-
-		URL lURL = lClassLoader.getResource(lPropertiesFile);
-
-		System.setProperty("conf.properties.location", lURL.toString());
-
-	}
-
-	private void clearTestFiles() {
-		CompressableCacheSegmentConfig lCompressableCacheSegmentConfig = null;
-
-		try {
-			lCompressableCacheSegmentConfig = AppConfig.bind(CompressableCacheSegmentConfig.class);
-		} catch (NumberFormatException | NoSuchElementException | URISyntaxException | ConfigurationException
-				| IOException e) {
-			sLogger.info("Unable to Instantiate CompressableCacheSegmentConfig");
-			assertTrue(false);
-		}
-
-		deleteFolderContents(new File(lCompressableCacheSegmentConfig.getCompressedFileBasePath()));
-		deleteFolderContents(new File(lCompressableCacheSegmentConfig.getUncompressedFileBasePath()));
-	}
-
-	@Test
-	void test() {
-		String lCurrentMethodName = new Object(){}.getClass().getEnclosingMethod().getName();
+	public CompressableCacheSegmentConfig component_readConfig (String lTestMethod) {
 		
-		sLogger.info("#################################### Start " + lCurrentMethodName + " ####################################");
+		sLogger.info("#################################### Start Read Config" + lTestMethod + " ####################################");
 		
-		setTestPropertiesFileLocation(lCurrentMethodName);
+		setTestPropertiesFileLocation(CLASS_NAME, lTestMethod);
 		
-		clearTestFiles();
-
-		
-
 		CompressableCacheSegmentConfig lCompressableCacheSegmentConfig = null;
 		
 		try {
@@ -119,6 +61,21 @@ class CompressableCacheSegmentJUnit {
 			assertTrue(false);
 		}
 
+		assertNotNull(lCompressableCacheSegmentConfig);
+		
+		sLogger.info("#################################### End Read Config" + lTestMethod + " ####################################");
+		
+		return lCompressableCacheSegmentConfig;
+	}
+	
+	
+	@Test
+	void test() {
+		String lCurrentMethodName = new Object(){}.getClass().getEnclosingMethod().getName();
+		
+		CompressableCacheSegmentConfig lCompressableCacheSegmentConfig = component_readConfig(lCurrentMethodName);
+		
+		
 		sLogger.info("#################################### Part 1 " + lCurrentMethodName + " ####################################");
 
 		//First open empty file then retire
@@ -164,7 +121,7 @@ class CompressableCacheSegmentJUnit {
 		try {
 			byte [] lScore = lCompressableCacheSegment.readScore(0,  lCompressableCacheSegmentConfig.getCacheSegmentUncompressedSize());
 			for (int i = 0 ; i < lScore.length; i++) {
-				assertEquals (lScore[i], 0);
+				assertEquals (0, lScore[i]);
 			}
 			
 			byte [] lScoreToWrite = new byte [] {Byte.MIN_VALUE};
@@ -239,12 +196,6 @@ class CompressableCacheSegmentJUnit {
 		
 		sLogger.info("#################################### Start " + lCurrentMethodName + " ####################################");
 		
-		setTestPropertiesFileLocation(lCurrentMethodName);
-		
-		clearTestFiles();
-
-		
-
 		CompressableCacheSegmentConfig lCompressableCacheSegmentConfig = null;
 		
 		try {

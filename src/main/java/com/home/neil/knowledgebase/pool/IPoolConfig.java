@@ -29,12 +29,6 @@ public interface IPoolConfig {
 	@DefaultConfigValue (value = "2")
 	public int getSubPoolRetirementThreadCount(int pSubPoolLevel);
 
-	public String getDrainResurrectionThreadClassFactory ();
-	public String getDrainRetirementThreadClassFactory ();
-
-	@DefaultConfigValue (value = "2")
-	public int getDrainRetirementThreadCount();
-	
 	@DefaultConfigValue (value = "false")
 	public boolean getDebug();
 	
